@@ -1,0 +1,33 @@
+/* groovylint-disable NoDef, VariableTypeRequired */
+/* groovylint-disable-next-line CompileStatic */
+node {
+    def app
+    def registry = 'arniva/XXX:latest'
+    def registryCredential = 'DOCKER_PAT'
+    stage('Clone repository') {
+        checkout scm
+    }
+    stage('Building image') {
+        app = docker.build(registry + ":${env.BUILD_NUMBER}")
+    }
+    stage('Push to dockerhub') {
+        docker.withRegistry('', registryCredential) {
+            app.push('latest')
+            app.push("0.0.$BUILD_NUMBER")
+        }
+    }
+    stage('Remove Unused docker images') {
+        sh "docker rmi $registry:latest"
+        sh "docker rmi $registry:$BUILD_NUMBER"
+    }
+    script {
+        echo 'Post Build Actions'
+        emailext (
+            to: '$DEFAULT_RECIPIENTS', 
+            replyTo: 'arniva.dev@gmail.com', 
+            subject: '$DEFAULT_SUBJECT',
+            body: '$DEFAULT_CONTENT',
+            mimeType: 'plain/text'
+        )
+    }
+}

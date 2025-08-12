@@ -1,0 +1,44 @@
+pipeline {
+    agent {label 'XXX'}
+
+    environment {
+        DOCKER_REGISTRY_CREDENTIALS = 'DOCKER_PAT'
+        DOCKER_IMAGE = 'arniva/XXX:latest'
+    }
+
+    stages {
+        stage('Pull Docker Image') {
+            steps {
+                script {
+                    docker.withRegistry('', DOCKER_REGISTRY_CREDENTIALS) {
+                        docker.image(DOCKER_IMAGE).pull()
+                    }
+                }
+            }
+        }
+
+        stage('Run Docker Compose') {
+            steps {
+                script {
+                    sh "cd /XXX && docker compose up -d"
+                }
+            }
+        }
+        stage('Remove Unused docker images') {
+            steps {
+                sh 'docker images --quiet --filter=dangling=true | xargs --no-run-if-empty docker rmi'
+            }
+        }
+    }
+    post {
+        always {
+            emailext (
+                to: '$DEFAULT_RECIPIENTS', 
+                replyTo: 'arniva.dev@gmail.com', 
+                subject: '$DEFAULT_SUBJECT',
+                body: '$DEFAULT_CONTENT',
+                mimeType: 'plain/text'
+            );
+        }
+    }
+}
