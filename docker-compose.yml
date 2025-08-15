@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  arniva-payment:
+    image: node:24-alpine
+    working_dir: /app
+    volumes:
+      - .:/app
+    ports:
+      - "5173:5173"
+    command: sh -c "corepack enable && corepack prepare pnpm@latest --activate && pnpm install && pnpm run dev --host 0.0.0.0"
