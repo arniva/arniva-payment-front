@@ -1,0 +1,46 @@
+// Required
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/variables-dark';
+
+@import 'config';
+
+// Your custom colors
+$customColors: (
+	'primary': $primaryColor,
+	'success': $successColor,
+	'lighter': $lighterColor,
+	'lightblue': $lightBlueColor,
+	'darkblue': $darkBlueColor,
+	'accent': $accentColor,
+	'dark': $darkColor,
+	'orange': $orangeColor,
+	'lightgray': $lightGrayColor,
+	'yellow': $yellowColor,
+	'danger': $dangerColor,
+);
+$theme-colors: map-merge($theme-colors, $customColors);
+
+// Override Bootstrap's color contrast function for buttons
+// This ensures white text on colored backgrounds
+$color-contrast-dark: #000;
+$color-contrast-light: #fff;
+$min-contrast-ratio: 3;
+
+$pagination-active-bg: $primaryColor;
+$pagination-active-color: #fff;
+$pagination-active-border-color: $primaryColor;
+$pagination-hover-bg: $lightGrayColor;
+$pagination-hover-color: #fff;
+
+@import 'bootstrap/scss/bootstrap';
+
+// Your other imports
+@import 'main';
+
+// Font imports remain the same
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+@import url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css');

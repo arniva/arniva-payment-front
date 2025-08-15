@@ -1,0 +1,28 @@
+body {
+    font-size: 14px;
+    background: var(--bs-gray-100);
+}
+
+.btn,
+.btn:focus,
+.btn:active,
+.btn:focus-visible,
+.btn:focus-within,
+.btn:active:focus-within {
+    outline: none !important;
+    // border: none !important;
+    box-shadow: none !important;
+    transition: none !important;
+}
+
+i.thick {
+	-webkit-text-stroke: 0.5px;
+}
+
+.form-label {
+    font-weight: bold;
+    font-size: 16px;
+}
+a {
+    color: var(--bs-primary);
+}
