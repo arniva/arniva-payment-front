@@ -15,9 +15,9 @@
 		let amount = selectedPackage.amount;
 		let total = selectedPackage.total;
 		let unitPrice = selectedPackage.unitPrice;
-		let rawUnitPrice = selectedPackage.unitPrice / 1.2;
-		let totalTax = selectedPackage.total - selectedPackage.total / 1.2;
-		let rawTotal = selectedPackage.total / 1.2;
+		let rawUnitPrice = selectedPackage.unitPrice;
+		let totalTax = selectedPackage.total - selectedPackage.total;
+		let rawTotal = selectedPackage.total;
 
 		return { amount, total, unitPrice, totalTax, rawTotal, rawUnitPrice };
 	});
