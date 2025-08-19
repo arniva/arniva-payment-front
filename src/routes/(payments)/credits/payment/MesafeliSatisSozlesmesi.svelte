@@ -103,7 +103,7 @@
 		<tr>
 			<td>E-Arşiv Kontör</td>
 			<td>{formatTurkishCurrency(product.rawUnitPrice)}</td>
-			<td>10 Adet</td>
+			<td>{product.amount} Adet</td>
 			<td>{formatTurkishCurrency(product.rawTotal)}</td>
 		</tr>
 	</tbody>

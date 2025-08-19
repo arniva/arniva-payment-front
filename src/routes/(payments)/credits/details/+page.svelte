@@ -218,7 +218,7 @@
 						<div class="card card-body p-4 border-0 shadow">
 							<h5 class="mb-2 text-primary">Ödenecek Tutar</h5>
 							<h2 class="mb-3">{formatTurkishCurrency(selectedPackage.total)}</h2>
-							<button type="submit" class="btn btn-lg btn-danger mb-4" disabled={!valid}
+							<button type="submit" class="btn btn-lg btn-arniva text-white mb-4" disabled={!valid}
 								>Devam Et <i class="bi bi-arrow-right"></i></button
 							>
 
@@ -234,7 +234,7 @@
 							</div>
 							<div class="alert alert-warning d-flex align-items-center py-2" role="alert">
 								<i class="bi bi-info-circle fs-5 me-3"></i>
-								<div>KDV dahil fiyatlardır</div>
+								<div>Fiyatlara KDV dahildir.</div>
 							</div>
 						</div>
 					{/if}

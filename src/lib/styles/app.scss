@@ -18,6 +18,7 @@ $customColors: (
 	'lightgray': $lightGrayColor,
 	'yellow': $yellowColor,
 	'danger': $dangerColor,
+	'arniva': $arnivaColor,
 );
 $theme-colors: map-merge($theme-colors, $customColors);
 
