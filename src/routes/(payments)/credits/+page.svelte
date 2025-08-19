@@ -18,11 +18,8 @@
 		return value.toLocaleString('tr-TR');
 	}
 
-	function formatPackages(p) {
-		// sort p by p.tip
-		if (!p || !p.length) return [];
-		p.sort((a, b) => (a.type < b.type ? -1 : 1));
-		return p;
+	function getPackages(p, type) {
+		return p.filter((pkg) => pkg.type === type);
 	}
 </script>
 
@@ -38,14 +35,21 @@
 						>Devam etmek için lütfen bir kontör paketi seçin.</span
 					>
 				</div>
-				<button type="submit" class="btn btn-lg btn-danger" disabled={!selected}
+				<button type="submit" class="btn btn-lg btn-arniva text-white" disabled={!selected}
 					><span class="d-none d-md-inline">Devam Et</span>
 					<i class="bi bi-arrow-right"></i></button
 				>
 			</div>
 			<div class="table-responsive">
-				<table class="table table-sm table-bordered table-hover align-middle bg-white shadow-sm">
+				<table
+					class="table table-sm table-bordered table-hover align-middle bg-white shadow-sm mb-4"
+				>
 					<thead class="table-light">
+						<tr>
+							<td colspan="4" class="text-success p-2 fs-6"
+								>E-Fatura, E-Arşiv, E-İrsaliye, E-Müstahsil, E-SMM Kontör Paketleri</td
+							>
+						</tr>
 						<tr>
 							<th>Kontör Adedi</th>
 							<th class="d-none d-md-table-cell">Birim Fiyatı</th>
@@ -54,21 +58,46 @@
 						</tr>
 					</thead>
 					<tbody>
-						{#each formatPackages(data.packages) as pkg, i (pkg.id)}
-							{@const typeText =
-								pkg.type === 1
-									? 'E-Arşiv Kontörü (Önerilir)'
-									: 'E-Adisyon ve Perakende Satış E-Arşiv Fatura'}
-							{#if i === 0 || pkg.type !== formatPackages(data.packages)[i - 1].type}
-								<tr>
-									<td
-										colspan="4"
-										class="table-light fw-bold fs-6 {pkg.type === 1
-											? 'text-success'
-											: 'text-danger'}">{typeText}</td
+						{#each getPackages(data.packages, 1) as pkg (pkg.id)}
+							<tr class="cursor-pointer {selected === pkg.id ? 'table-primary' : ''}">
+								<td>{formatThousands(pkg.amount)} Adet</td>
+								<td class="d-none d-md-table-cell">{formatTurkishCurrency(pkg.unitPrice)}</td>
+								<td>{formatTurkishCurrency(pkg.total)}</td>
+								<td class="text-center">
+									<button
+										type="button"
+										onclick={() => {
+											selected = pkg.id;
+											if (pkg.type === 1) return;
+											let mdl = new bootstrap.Modal(packageWarningModal);
+											mdl.show();
+										}}
+										class="btn {selected === pkg.id
+											? 'btn-primary'
+											: 'btn-outline-primary'} btn-sm px-4"
+										>{selected === pkg.id ? 'Seçildi' : 'Seçiniz'}</button
 									>
-								</tr>
-							{/if}
+								</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+				<table
+					class="table table-sm table-bordered table-hover align-middle bg-white shadow-sm mb-4"
+				>
+					<thead class="table-light">
+						<tr>
+							<td colspan="4" class="text-danger p-2 fs-6">E-Adisyon Kontör Paketleri</td>
+						</tr>
+						<tr>
+							<th>Kontör Adedi</th>
+							<th class="d-none d-md-table-cell">Birim Fiyatı</th>
+							<th>Tutarı</th>
+							<th class="text-center">Seçiniz</th>
+						</tr>
+					</thead>
+					<tbody>
+						{#each getPackages(data.packages, 2) as pkg (pkg.id)}
 							<tr class="cursor-pointer {selected === pkg.id ? 'table-primary' : ''}">
 								<td>{formatThousands(pkg.amount)} Adet</td>
 								<td class="d-none d-md-table-cell">{formatTurkishCurrency(pkg.unitPrice)}</td>
@@ -94,7 +123,7 @@
 				</table>
 				<div class="alert alert-warning py-2" role="alert">
 					<i class="bi bi-exclamation-triangle"></i> <strong>UYARI:</strong> Tablonun altında yer alan
-					kontör paketleri E-Adisyon ve Perakende Satış E-Arşiv Faturası için önerilmektedir.
+					kontör paketleri E-Adisyon için geçerlidir.
 				</div>
 			</div>
 		</div>
@@ -115,9 +144,8 @@
 				<h1 class="modal-title fs-5" id="packageWarningModalLabel">Uyarı</h1>
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
-			<div class="modal-body p-4">
-				Seçmiş olduğunuz paket, E-Adisyon ve Perakende Satış E-Arşiv Faturası için önerilmemektedir.
-				Eğer E-Arşiv Kontörü kullanmak istiyorsanız, lütfen önerilen paketlerden birini seçin.
+			<div class="modal-body p-4 lead">
+				Seçmiş olduğunuz paket, E-Adisyon paketlerinde geçerlidir.
 			</div>
 			<div class="modal-footer border-0">
 				<button type="button" class="btn btn-danger" data-bs-dismiss="modal">Kapat</button>
