@@ -143,7 +143,7 @@
 				<div class="col-12 col-md-8 order-1 order-md-2 pe-4 mb-4 mb-md-0">
 					<div class="mb-4">
 						<h4 class="mb-0 text-muted">Kart Bilgileri</h4>
-						<span class="text-muted">Devam etmek için lütfen kart bilgilerinizi girin.</span>
+						<span class="text-muted">Devam etmek için lütfen kart bilgilerinizi giriniz.</span>
 					</div>
 
 					<CreditCard bind:formData />
@@ -196,7 +196,7 @@
 										yearComponent && yearComponent.open();
 									}}
 								>
-									<option value="">Ay seçin</option>
+									<option value="">Ay seçiniz</option>
 									<option value="01">01 - Ocak</option>
 									<option value="02">02 - Şubat</option>
 									<option value="03">03 - Mart</option>
@@ -225,7 +225,7 @@
 									class="form-select"
 									id="validUntilYear"
 								>
-									<option value="">Yıl seçin</option>
+									<option value="">Yıl seçiniz</option>
 									{#each Array.from({ length: maxYear - minYear + 1 }, (_, i) => minYear + i) as year (year)}
 										<option value={year.toString()}>{year}</option>
 									{/each}

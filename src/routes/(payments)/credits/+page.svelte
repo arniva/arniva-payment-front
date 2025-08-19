@@ -30,9 +30,9 @@
 		<div class="col-12 col-lg-9">
 			<div class="d-flex align-items-start justify-content-between mb-3">
 				<div>
-					<h4 class="mb-0 text-muted">Kontür Seçiniz</h4>
+					<h4 class="mb-0 text-muted">Kontör Seçiniz</h4>
 					<span class="text-muted d-none d-md-inline"
-						>Devam etmek için lütfen bir kontör paketi seçin.</span
+						>Devam etmek için lütfen bir kontör paketi seçiniz.</span
 					>
 				</div>
 				<button type="submit" class="btn btn-lg btn-arniva text-white" disabled={!selected}
@@ -123,7 +123,7 @@
 				</table>
 				<div class="alert alert-warning py-2" role="alert">
 					<i class="bi bi-exclamation-triangle"></i> <strong>UYARI:</strong> Tablonun altında yer alan
-					kontör paketleri E-Adisyon için geçerlidir.
+					kontör paketleri yalnız E-Adisyon için geçerlidir.
 				</div>
 			</div>
 		</div>
@@ -145,7 +145,7 @@
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body p-4 lead">
-				Seçmiş olduğunuz paket, E-Adisyon paketlerinde geçerlidir.
+				Seçmiş olduğunuz paket yalnız E-Adisyon paketlerinde geçerlidir.
 			</div>
 			<div class="modal-footer border-0">
 				<button type="button" class="btn btn-danger" data-bs-dismiss="modal">Kapat</button>
