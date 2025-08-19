@@ -2,6 +2,10 @@
 	import type { PageProps } from './$types';
 	import { onMount } from 'svelte';
 	import CreditCard from './CreditCard.svelte';
+	import MesafeliSatisSozlesmesi from './MesafeliSatisSozlesmesi.svelte';
+	import IptalVeIadeKosullari from './IptalVeIadeKosullari.svelte';
+	import { calculateInstallmentAmount, formatTurkishCurrency } from './functions.svelte';
+	import InstallmentOptionsBox from './InstallmentOptionsBox.svelte';
 
 	let { data, form }: PageProps = $props();
 	let confirmCheck = $state(false);
@@ -43,30 +47,29 @@
 		{ value: 10, label: '10 Taksit', newPricePercentage: 145 }
 	];
 
-	function calculateInstallmentAmount(installment) {
-		if (!selectedPackage) return '';
+	// function calculateInstallmentAmount(installment) {
+	// 	if (!selectedPackage) return '';
 
-		let total = selectedPackage.total;
-		let newPricePercentage =
-			installmentOptions.find((option) => option.value === installment)?.newPricePercentage || 100;
-		let installmentAmount = (total * newPricePercentage) / 100 / installment;
-		let totalAmount = installmentAmount * installment;
-		return {
-			totalAmount: totalAmount,
-			installmentAmount: installmentAmount
-		};
-	}
+	// 	let total = selectedPackage.total;
+	// 	let newPricePercentage =
+	// 		installmentOptions.find((option) => option.value === installment)?.newPricePercentage || 100;
+	// 	let installmentAmount = (total * newPricePercentage) / 100 / installment;
+	// 	let totalAmount = installmentAmount * installment;
+	// 	return {
+	// 		totalAmount: totalAmount,
+	// 		installmentAmount: installmentAmount
+	// 	};
+	// }
 
-	function getFormattedAndCalculateInstallmentAmount(installment: number): string {
-		console.log('installment', installment);
-		let calculatedAmounts = calculateInstallmentAmount(installment);
-		return (
-			formatTurkishCurrency(calculatedAmounts.installmentAmount) +
-			' (' +
-			formatTurkishCurrency(calculatedAmounts.totalAmount) +
-			')'
-		);
-	}
+	// function getFormattedAndCalculateInstallmentAmount(installment: number): string {
+	// 	let calculatedAmounts = calculateInstallmentAmount(installment);
+	// 	return (
+	// 		formatTurkishCurrency(calculatedAmounts.installmentAmount) +
+	// 		' (' +
+	// 		formatTurkishCurrency(calculatedAmounts.totalAmount) +
+	// 		')'
+	// 	);
+	// }
 
 	function handleCardInput(event: Event) {
 		let input = event.target as HTMLInputElement;
@@ -102,16 +105,6 @@
 		);
 	});
 
-	function formatTurkishCurrency(value: number): string {
-		if (!value) return '';
-		return (
-			value.toLocaleString('tr-TR', {
-				minimumFractionDigits: 2,
-				maximumFractionDigits: 2
-			}) + ' ₺'
-		);
-	}
-
 	function formatThousands(value: number): string {
 		if (!value) return '';
 		return value.toLocaleString('tr-TR');
@@ -124,11 +117,11 @@
 		}
 	});
 
-	function openInstallmentModal() {
-		// Logic to open the installment modal
-		const modal = new bootstrap.Modal(document.getElementById('installmentModal'));
-		modal.show();
-	}
+	// function openInstallmentModal() {
+	// 	// Logic to open the installment modal
+	// 	const modal = new bootstrap.Modal(document.getElementById('installmentModal'));
+	// 	modal.show();
+	// }
 </script>
 
 <div class="row justify-content-center">
@@ -138,6 +131,10 @@
 			<input type="hidden" name="vkn" value={form?.data?.vkn} />
 			<input type="hidden" name="unvan" value={form?.data?.unvan} />
 			<input type="hidden" name="description" value={form?.data?.description} />
+			<input type="hidden" name="adres" value={form?.data?.adres} />
+			<input type="hidden" name="il" value={form?.data?.il} />
+			<input type="hidden" name="ilce" value={form?.data?.ilce} />
+			<input type="hidden" name="postakodu" value={form?.data?.postakodu} />
 
 			<div class="row">
 				<!-- This will be col-8 on desktop, but appear second on mobile -->
@@ -183,159 +180,94 @@
 						/>
 					</div>
 
-					<!-- CVC, Month, and Year fields - responsive layout -->
-					<div class="row">
-						<div class="col-12 col-md-4 mb-3">
-							<label for="cvc" class="form-label">CVC <code>*</code></label>
-							<input
-								bind:value={formData.cvc}
-								name="cvc"
-								type="text"
-								class="form-control"
-								id="cvc"
-								placeholder="123"
-								maxlength="3"
-								oninput={handleCvcInput}
-								autocomplete="off"
-								required
-							/>
-						</div>
-						<div class="col-12 col-md-4 mb-3">
-							<label for="validUntilMonth" class="form-label">Ay <code>*</code></label>
-							<select
-								bind:value={formData.validUntilMonth}
-								name="validUntilMonth"
-								class="form-select"
-								id="validUntilMonth"
-								required
-							>
-								<option value="">Ay seçin</option>
-								<option value="01">01 - Ocak</option>
-								<option value="02">02 - Şubat</option>
-								<option value="03">03 - Mart</option>
-								<option value="04">04 - Nisan</option>
-								<option value="05">05 - Mayıs</option>
-								<option value="06">06 - Haziran</option>
-								<option value="07">07 - Temmuz</option>
-								<option value="08">08 - Ağustos</option>
-								<option value="09">09 - Eylül</option>
-								<option value="10">10 - Ekim</option>
-								<option value="11">11 - Kasım</option>
-								<option value="12">12 - Aralık</option>
-							</select>
-						</div>
-						<div class="col-12 col-md-4 mb-3">
-							<label for="validUntilYear" class="form-label">Yıl <code>*</code></label>
-							<select
-								bind:value={formData.validUntilYear}
-								name="validUntilYear"
-								class="form-select"
-								id="validUntilYear"
-							>
-								<option value="">Yıl seçin</option>
-								{#each Array.from({ length: maxYear - minYear + 1 }, (_, i) => minYear + i) as year (year)}
-									<option value={year.toString()}>{year}</option>
-								{/each}
-							</select>
-						</div>
-						{#if cardValid}
-							{@const selectedInstallment = installmentOptions.find(
-								(option) => option.value === formData.installment
-							)}
-							<div class="col-12 mb-3 mt-2">
-								<label
-									for="installments"
-									class="form-label d-flex align-items-center justify-content-between"
-									><span>Taksit Sayısı <code>*</code></span>
-								</label>
-								<!-- <select
-									bind:value={formData.installment}
-									name="installments"
+					<div class="d-block d-lg-flex gap-3 align-items-center justify-content-between">
+						<div class="d-block d-lg-flex gap-3">
+							<div class="mb-3">
+								<label for="validUntilMonth" class="form-label">Ay <code>*</code></label>
+								<select
+									bind:value={formData.validUntilMonth}
+									name="validUntilMonth"
 									class="form-select"
-									id="installments"
+									id="validUntilMonth"
+									required
 								>
-									{#each installmentOptions as option (option.value)}
-										<option value={option.value}
-											>{option.label +
-												' - ' +
-												getFormattedAndCalculateInstallmentAmount(option.value)}</option
-										>
-									{/each}
-								</select> -->
-								{#if selectedInstallment}
-									<div class="list-group d-grid gap-2 border-0 mb-3">
-										<div class="position-relative">
-											<input
-												class="form-check-input position-absolute top-50 start-0 ms-3 fs-5"
-												type="radio"
-												name="installmentRadioSelected"
-												id="installmentRadioSelected"
-												value={selectedInstallment.value}
-												checked={formData.installment === selectedInstallment.value}
-											/>
-											<label
-												class="list-group-item py-3 ps-3 rounded-3 bg-light"
-												for="installmentRadioSelected"
-											>
-												<div class="d-flex align-items-center justify-content-between">
-													<div>
-														<strong class="fw-semibold">{selectedInstallment.label}</strong>
-														{#if selectedInstallment.value > 1}
-															{@const calculatedAmounts = calculateInstallmentAmount(
-																selectedInstallment.value
-															)}
-															<span class="text-muted ms-2">
-																<i class="bi bi-x-lg thick"></i>
-																<span class="fs-6"
-																	>{formatTurkishCurrency(
-																		calculatedAmounts.installmentAmount
-																	)}</span
-																>
-																{#if selectedInstallment.newPricePercentage === 100}
-																	<span class="badge bg-success ms-2">Peşin Fiyatına</span>
-																{/if}
-															</span>
-														{/if}
-													</div>
-													<button
-														onclick={openInstallmentModal}
-														type="button"
-														class="btn btn-outline-primary btn-sm">Değiştir</button
-													>
-												</div>
-												<div class="text-muted lead">
-													{#if selectedInstallment.value === 1}
-														{@const calculatedAmounts = calculateInstallmentAmount(
-															selectedInstallment.value
-														)}
-														{formatTurkishCurrency(calculatedAmounts.totalAmount)}
-													{:else}
-														{@const calculatedAmounts = calculateInstallmentAmount(
-															selectedInstallment.value
-														)}
-														{formatTurkishCurrency(calculatedAmounts.totalAmount)}
-													{/if}
-												</div>
-											</label>
-										</div>
-									</div>
-								{/if}
+									<option value="">Ay seçin</option>
+									<option value="01">01 - Ocak</option>
+									<option value="02">02 - Şubat</option>
+									<option value="03">03 - Mart</option>
+									<option value="04">04 - Nisan</option>
+									<option value="05">05 - Mayıs</option>
+									<option value="06">06 - Haziran</option>
+									<option value="07">07 - Temmuz</option>
+									<option value="08">08 - Ağustos</option>
+									<option value="09">09 - Eylül</option>
+									<option value="10">10 - Ekim</option>
+									<option value="11">11 - Kasım</option>
+									<option value="12">12 - Aralık</option>
+								</select>
 							</div>
-						{/if}
+							<div class="mb-3">
+								<label for="validUntilYear" class="form-label">Yıl <code>*</code></label>
+								<select
+									bind:value={formData.validUntilYear}
+									name="validUntilYear"
+									class="form-select"
+									id="validUntilYear"
+								>
+									<option value="">Yıl seçin</option>
+									{#each Array.from({ length: maxYear - minYear + 1 }, (_, i) => minYear + i) as year (year)}
+										<option value={year.toString()}>{year}</option>
+									{/each}
+								</select>
+							</div>
+						</div>
+						<div>
+							<div class="mb-3">
+								<label for="cvc" class="form-label">CVC <code>*</code></label>
+								<input
+									bind:value={formData.cvc}
+									name="cvc"
+									type="text"
+									class="form-control"
+									id="cvc"
+									placeholder="123"
+									maxlength="3"
+									oninput={handleCvcInput}
+									autocomplete="off"
+									required
+								/>
+							</div>
+						</div>
 					</div>
+
+					{#if cardValid}
+						{@const selectedInstallment = installmentOptions.find(
+							(option) => option.value === formData.installment
+						)}
+						<InstallmentOptionsBox
+							{installmentOptions}
+							{selectedInstallment}
+							{selectedPackage}
+							{formData}
+						/>
+					{/if}
 				</div>
 
 				<!-- This will be col-4 on desktop, but appear first on mobile -->
 				<div class="col-12 col-md-4 order-1 order-md-2">
 					{#if selectedPackage}
-						<div class="card card-body p-4 border-0 shadow">
+						<div class="card card-body p-4 border-0 shadow sticky-top top-0">
 							<h5 class="mb-2 text-primary">Ödenecek Tutar</h5>
 							{#if formData.installment === 1}
 								<h2 class="mb-3">
 									{formatTurkishCurrency(selectedPackage.total)}
 								</h2>
 							{:else}
-								{@const newAmount = calculateInstallmentAmount(formData.installment)}
+								{@const newAmount = calculateInstallmentAmount(
+									formData.installment,
+									selectedPackage,
+									installmentOptions
+								)}
 								<div class="mb-3">
 									<h2 class="mb-0">
 										{formatTurkishCurrency(newAmount.totalAmount)}
@@ -358,7 +290,18 @@
 									><i class="bi bi-check-lg text-white fs-6"></i></label
 								><br />
 								<label for="readAndApproved" class="ms-2"
-									><a href="">Mesafeli Satış Sözleşmesi</a>'ni okudum anladım.</label
+									><a
+										data-bs-toggle="offcanvas"
+										href="#mesafeliSatisSozlesmesi"
+										role="button"
+										aria-controls="mesafeliSatisSozlesmesi">Mesafeli Satış Sözleşmesi</a
+									>'ni ve
+									<a
+										data-bs-toggle="offcanvas"
+										href="#iptalVeIadeKosullari"
+										role="button"
+										aria-controls="iptalVeIadeKosullari">İptal ve İade Koşulları</a
+									>'nı okudum anladım.</label
 								>
 							</div>
 
@@ -381,7 +324,7 @@
 							</div>
 							<div class="alert alert-warning d-flex align-items-center py-2" role="alert">
 								<i class="bi bi-info-circle fs-5 me-3"></i>
-								<div>KDV hariç fiyatlardır</div>
+								<div>KDV dahil fiyatlardır</div>
 							</div>
 						</div>
 					{/if}
@@ -391,7 +334,7 @@
 	</div>
 </div>
 
-<div
+<!-- <div
 	class="modal fade"
 	id="installmentModal"
 	tabindex="-1"
@@ -407,7 +350,11 @@
 			<div class="modal-body">
 				{#if cardValid && installmentOptions}
 					{#each installmentOptions as option (option.value)}
-						{@const calculatedAmounts = calculateInstallmentAmount(option.value)}
+						{@const calculatedAmounts = calculateInstallmentAmount(
+							option.value,
+							selectedPackage,
+							installmentOptions
+						)}
 						<div class="list-group list-group-radio d-grid gap-2 border-0 mb-2">
 							<div class="position-relative">
 								<input
@@ -453,36 +400,52 @@
 			</div>
 		</div>
 	</div>
+</div> -->
+
+<div
+	class="offcanvas offcanvas-start"
+	tabindex="-1"
+	id="mesafeliSatisSozlesmesi"
+	aria-labelledby="mesafeliSatisSozlesmesiLabel"
+>
+	<div class="offcanvas-header">
+		<h5 class="offcanvas-title" id="mesafeliSatisSozlesmesiLabel">Mesafeli Satış Sözleşmesi</h5>
+		<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+	</div>
+	<div class="offcanvas-body p-3 p-md-4">
+		{#if formData && selectedPackage}
+			<MesafeliSatisSozlesmesi {form} {selectedPackage} />
+		{/if}
+	</div>
+</div>
+
+<div
+	class="offcanvas offcanvas-start"
+	tabindex="-1"
+	id="iptalVeIadeKosullari"
+	aria-labelledby="iptalVeIadeKosullariLabel"
+>
+	<div class="offcanvas-header">
+		<h5 class="offcanvas-title" id="iptalVeIadeKosullariLabel">İptal ve İade Koşulları</h5>
+		<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+	</div>
+	<div class="offcanvas-body p-3 p-md-4">
+		{#if formData && selectedPackage}
+			<IptalVeIadeKosullari />
+		{/if}
+	</div>
 </div>
 
 <style>
-	.form-check-input:checked[type='radio'] {
-		--bs-form-check-bg-image: url(
-			data:image/svg + xml,
-			%3csvgxmlns='http://www.w3.org/2000/svg'viewBox='-4 -4 8 8'%3e%3ccircler='2'fill='%23fff'/%3e%3c/svg%3e
-		);
+	#mesafeliSatisSozlesmesi,
+	#iptalVeIadeKosullari {
+		width: 75%;
 	}
 
-	.list-group-radio .form-check-input:checked + .list-group-item {
-		background-color: var(--bs-body);
-		border-color: var(--bs-primary);
-		box-shadow: 0 0 0 2px var(--bs-primary);
-	}
-
-	.list-group-radio .list-group-item {
-		cursor: pointer;
-		border-radius: 0.5rem;
-	}
-	.form-check-input:checked {
-		background-color: #0d6efd;
-		border-color: #0d6efd;
-	}
-	.list-group-radio .form-check-input {
-		z-index: 2;
-		margin-top: -0.5em;
-	}
-	.list-group-radio .list-group-item {
-		cursor: pointer;
-		border-radius: 0.5rem;
+	@media (max-width: 768px) {
+		#mesafeliSatisSozlesmesi,
+		#iptalVeIadeKosullari {
+			width: 100%;
+		}
 	}
 </style>

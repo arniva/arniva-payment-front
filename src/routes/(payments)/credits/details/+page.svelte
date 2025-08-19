@@ -2,8 +2,6 @@
 	import type { PageProps } from './$types';
 	let { data, form }: PageProps = $props();
 	import { onMount } from 'svelte';
-	console.log('data....', data);
-	console.log('form....', form);
 	let selectedPackage = form?.data?.selectedPackageId
 		? data.packages.find((pkg) => pkg.id === form.data.selectedPackageId)
 		: null;
@@ -11,6 +9,10 @@
 	let formData = $state({
 		vkn: '',
 		unvan: '',
+		adres: '',
+		il: '',
+		ilce: '',
+		postakodu: '',
 		description: ''
 	});
 
@@ -46,12 +48,15 @@
 	});
 
 	async function handleVknApiCall(vknValue: string) {
-		console.log('Fetching VKN data...');
 		const res = await fetch(`https://payment-api.arniva.tr/v1/mukellefler/${vknValue}`);
 		if (res.ok) {
 			const json = await res.json();
 			if (json && json.data && json.code === 0) {
 				formData.unvan = json.data.adi;
+				formData.adres = json.data.adres;
+				formData.il = json.data.il;
+				formData.ilce = json.data.ilce;
+				formData.postakodu = json.data.postakodu;
 			}
 		}
 	}
@@ -138,11 +143,56 @@
 							bind:value={formData.unvan}
 							name="unvan"
 							type="text"
-							class="form-control bg-light"
+							class="form-control"
 							id="unvan"
 							placeholder="Ünvan"
-							readonly
 						/>
+					</div>
+					<div class="mb-3">
+						<label for="adres" class="form-label">Adres <code>*</code></label>
+						<input
+							bind:value={formData.adres}
+							name="adres"
+							type="text"
+							class="form-control"
+							id="adres"
+							placeholder="Adres"
+						/>
+					</div>
+					<div class="mb-3 row">
+						<div class="col-12 col-md-4">
+							<label for="il" class="form-label">İl <code>*</code></label>
+							<input
+								bind:value={formData.il}
+								name="il"
+								type="text"
+								class="form-control"
+								id="il"
+								placeholder="İl"
+							/>
+						</div>
+						<div class="col-12 col-md-4">
+							<label for="ilce" class="form-label">İlçe <code>*</code></label>
+							<input
+								bind:value={formData.ilce}
+								name="ilce"
+								type="text"
+								class="form-control"
+								id="ilce"
+								placeholder="İlçe"
+							/>
+						</div>
+						<div class="col-12 col-md-4">
+							<label for="postakodu" class="form-label">Posta Kodu <code>*</code></label>
+							<input
+								bind:value={formData.postakodu}
+								name="postakodu"
+								type="text"
+								class="form-control"
+								id="postakodu"
+								placeholder="Posta Kodu"
+							/>
+						</div>
 					</div>
 					<div class="mb-3">
 						<label for="description" class="form-label">Açıklama</label>
@@ -184,7 +234,7 @@
 							</div>
 							<div class="alert alert-warning d-flex align-items-center py-2" role="alert">
 								<i class="bi bi-info-circle fs-5 me-3"></i>
-								<div>KDV hariç fiyatlardır</div>
+								<div>KDV dahil fiyatlardır</div>
 							</div>
 						</div>
 					{/if}

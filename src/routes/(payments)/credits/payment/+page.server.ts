@@ -15,13 +15,18 @@ export const actions = {
   next: async ({ request }) => {
     const formData = await request.formData();
     // Process your object here
+    // adres il ilce postakodu
     return {
       success: true,
       data: {
         selectedPackageId: formData.get('selectedPackageId'),
         vkn: formData.get('vkn'),
         unvan: formData.get('unvan'),
-        description: formData.get('description')
+        description: formData.get('description'),
+        adres: formData.get('adres'),
+        il: formData.get('il'),
+        ilce: formData.get('ilce'),
+        postakodu: formData.get('postakodu')
       }
     };
   },
@@ -57,7 +62,6 @@ export const actions = {
     }
     // Check all fields
     const allFieldsFilled = Object.values(cardBody).every(value => value);
-
     if (!allFieldsFilled) {
       return {
         success: false,
@@ -75,10 +79,19 @@ export const actions = {
       taksit: 0,
       kart4: Number(String(formData.get('no')).slice(-4)),
       kartsahibi: formData.get('name'),
+      adres: formData.get('adres'),
+      il: formData.get('il'),
+      ilce: formData.get('ilce'),
+      postakodu: formData.get('postakodu')
     }
-    
 
-    const allFieldsValid = Object.values(postBody).every(value => value !== undefined && value !== null && (typeof value === 'number' || value !== ''));
+    const requiredFields = ['vtc', 'unvan', 'paket_id', 'kart4', 'kartsahibi', 'adres', 'il', 'ilce', 'postakodu'];
+
+    const allFieldsValid = requiredFields.every(field => postBody[field] !== undefined && postBody[field] !== null && (typeof postBody[field] === 'number' || postBody[field] !== ''));
+
+    // const allFieldsValid = Object.values(postBody).every(value => value !== undefined && value !== null && (typeof value === 'number' || value !== ''));
+    console.log("allFieldsValid:", allFieldsValid)
+    console.log("postBody:", postBody)
     if (!allFieldsValid) {
       return {
         success: false,

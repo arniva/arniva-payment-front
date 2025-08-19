@@ -13,7 +13,8 @@ export const load = (async ({ fetch }) => {
                 id: pkg.id,
                 amount: pkg.adet,
                 unitPrice: pkg.birimfiyat,
-                total: pkg.adet * pkg.birimfiyat
+                total: pkg.adet * pkg.birimfiyat,
+                type: pkg.tip
             }));
         }
     }
