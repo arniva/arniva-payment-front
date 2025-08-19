@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { PageProps } from './$types'; // removed unused import
 	let { data }: PageProps = $props(); // removed unused variable
+	let packageWarningModal: HTMLDivElement | null;
 
 	let selected: null | number = $state(null);
 
@@ -15,6 +16,13 @@
 
 	function formatThousands(value: number): string {
 		return value.toLocaleString('tr-TR');
+	}
+
+	function formatPackages(p) {
+		// sort p by p.tip
+		if (!p || !p.length) return [];
+		p.sort((a, b) => (a.type < b.type ? -1 : 1));
+		return p;
 	}
 </script>
 
@@ -46,7 +54,21 @@
 						</tr>
 					</thead>
 					<tbody>
-						{#each data.packages as pkg, i (pkg.amount)}
+						{#each formatPackages(data.packages) as pkg, i (pkg.id)}
+							{@const typeText =
+								pkg.type === 1
+									? 'E-Arşiv Kontörü (Önerilir)'
+									: 'E-Adisyon ve Perakende Satış E-Arşiv Fatura'}
+							{#if i === 0 || pkg.type !== formatPackages(data.packages)[i - 1].type}
+								<tr>
+									<td
+										colspan="4"
+										class="table-light fw-bold fs-6 {pkg.type === 1
+											? 'text-success'
+											: 'text-danger'}">{typeText}</td
+									>
+								</tr>
+							{/if}
 							<tr class="cursor-pointer {selected === pkg.id ? 'table-primary' : ''}">
 								<td>{formatThousands(pkg.amount)} Adet</td>
 								<td class="d-none d-md-table-cell">{formatTurkishCurrency(pkg.unitPrice)}</td>
@@ -54,7 +76,12 @@
 								<td class="text-center">
 									<button
 										type="button"
-										onclick={() => (selected = pkg.id)}
+										onclick={() => {
+											selected = pkg.id;
+											if (pkg.type === 1) return;
+											let mdl = new bootstrap.Modal(packageWarningModal);
+											mdl.show();
+										}}
 										class="btn {selected === pkg.id
 											? 'btn-primary'
 											: 'btn-outline-primary'} btn-sm px-4"
@@ -65,10 +92,39 @@
 						{/each}
 					</tbody>
 				</table>
+				<div class="alert alert-warning py-2" role="alert">
+					<i class="bi bi-exclamation-triangle"></i> <strong>UYARI:</strong> Tablonun altında yer alan
+					kontör paketleri E-Adisyon ve Perakende Satış E-Arşiv Faturası için önerilmektedir.
+				</div>
 			</div>
 		</div>
 	</div>
 </form>
+
+<div
+	bind:this={packageWarningModal}
+	class="modal fade"
+	id="packageWarningModal"
+	tabindex="-1"
+	aria-labelledby="packageWarningModalLabel"
+	aria-hidden="true"
+>
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header border-0">
+				<h1 class="modal-title fs-5" id="packageWarningModalLabel">Uyarı</h1>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body p-4">
+				Seçmiş olduğunuz paket, E-Adisyon ve Perakende Satış E-Arşiv Faturası için önerilmemektedir.
+				Eğer E-Arşiv Kontörü kullanmak istiyorsanız, lütfen önerilen paketlerden birini seçin.
+			</div>
+			<div class="modal-footer border-0">
+				<button type="button" class="btn btn-danger" data-bs-dismiss="modal">Kapat</button>
+			</div>
+		</div>
+	</div>
+</div>
 
 <style>
 	.table th,

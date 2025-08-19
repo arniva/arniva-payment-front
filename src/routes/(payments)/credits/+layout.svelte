@@ -4,8 +4,6 @@
 	let { data, children }: LayoutProps = $props();
 	// Wizard step info from page data
 	const wizard = page?.data?.custom || {};
-	console.log('data', data);
-	console.log('wizard', wizard);
 </script>
 
 <div class="py-4 card card-body">
@@ -66,7 +64,7 @@
 			<p class="mb-3 text-secondary">
 				Bu sayfa üzerinden, Hızlı Bilişim Teknolojileri altyapısını kullanarak e-dönüşüm entegrasyon
 				paketleri için gerekli kontörleri kolayca satın alabilirsiniz.
-				<code> Tüm fiyatlar KDV hariçtir. </code>
+				<code> Tüm fiyatlar KDV dahil fiyatlardır. </code>
 			</p>
 			<div class="d-flex justify-content-end">
 				<img src="/Gemini_Generated_Image_8fcq2h8fcq2h8fcq.webp" height="40" alt="" />
