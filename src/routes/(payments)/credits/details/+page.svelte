@@ -120,7 +120,7 @@
 				<div class="col-12 col-md-8 order-2 order-md-1 pe-4">
 					<div class="mb-4">
 						<h4 class="mb-0 text-muted">Kimlik Bilgileri</h4>
-						<span class="text-muted">Devam etmek için lütfen kimlik bilgilerinizi girin.</span>
+						<span class="text-muted">Devam etmek için lütfen kimlik bilgilerinizi giriniz.</span>
 					</div>
 
 					<div class="mb-3">
