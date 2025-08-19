@@ -32,35 +32,7 @@
 			<div class="offcanvas-body">
 				<ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
 					<li class="nav-item">
-						<a class="nav-link active" aria-current="page" href="https://arniva.tr/"
-							>Web Sitesine Git</a
-						>
-					</li>
-					<li class="nav-item dropdown">
-						<a
-							class="nav-link dropdown-toggle"
-							href="#"
-							role="button"
-							data-bs-toggle="dropdown"
-							aria-expanded="false"
-							aria-label="Toggle user menu"
-						>
-							<i class="bi bi-person"></i>
-						</a>
-						<ul class="dropdown-menu dropdown-menu-end">
-							<li>
-								<a class="dropdown-item" href="#">Giriş Yap</a>
-							</li>
-							<li>
-								<a class="dropdown-item" href="#">Yardım</a>
-							</li>
-							<li>
-								<hr class="dropdown-divider" />
-							</li>
-							<li>
-								<a class="dropdown-item" href="#">Hakkında</a>
-							</li>
-						</ul>
+						<span>Arniva Ödeme Portalı</span>
 					</li>
 				</ul>
 			</div>
