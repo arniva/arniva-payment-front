@@ -6,9 +6,11 @@
 	import IptalVeIadeKosullari from './IptalVeIadeKosullari.svelte';
 	import { calculateInstallmentAmount, formatTurkishCurrency } from './functions.svelte';
 	import InstallmentOptionsBox from './InstallmentOptionsBox.svelte';
+	import YearSelect from './YearSelect.svelte';
 
 	let { data, form }: PageProps = $props();
 	let confirmCheck = $state(false);
+	let yearComponent;
 	let selectedPackage = form?.data?.selectedPackageId
 		? data.packages.find((pkg) => pkg.id === form.data.selectedPackageId)
 		: null;
@@ -190,6 +192,9 @@
 									class="form-select"
 									id="validUntilMonth"
 									required
+									onchange={() => {
+										yearComponent && yearComponent.open();
+									}}
 								>
 									<option value="">Ay seçin</option>
 									<option value="01">01 - Ocak</option>
@@ -207,6 +212,12 @@
 								</select>
 							</div>
 							<div class="mb-3">
+								<!-- <YearSelect
+									bind:this={yearComponent}
+									{maxYear}
+									{minYear}
+									bind:value={formData.validUntilYear}
+								/> -->
 								<label for="validUntilYear" class="form-label">Yıl <code>*</code></label>
 								<select
 									bind:value={formData.validUntilYear}
@@ -307,7 +318,7 @@
 
 							<button
 								type="submit"
-								class="btn btn-lg btn-danger mb-4"
+								class="btn btn-lg btn-arniva text-white mb-4"
 								disabled={!cardValid || !confirmCheck}
 								>Ödeme Yap <i class="bi bi-arrow-right"></i></button
 							>
@@ -324,7 +335,7 @@
 							</div>
 							<div class="alert alert-warning d-flex align-items-center py-2" role="alert">
 								<i class="bi bi-info-circle fs-5 me-3"></i>
-								<div>KDV dahil fiyatlardır</div>
+								<div>Fiyatlara KDV dahildir.</div>
 							</div>
 						</div>
 					{/if}

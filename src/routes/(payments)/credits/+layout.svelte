@@ -64,7 +64,7 @@
 			<p class="mb-3 text-secondary">
 				Bu sayfa üzerinden, Hızlı Bilişim Teknolojileri altyapısını kullanarak e-dönüşüm entegrasyon
 				paketleri için gerekli kontörleri kolayca satın alabilirsiniz.
-				<code> Tüm fiyatlar KDV dahil fiyatlardır. </code>
+				<code> Tüm fiyatlars KDV dahildir. </code>
 			</p>
 			<div class="d-flex justify-content-end">
 				<img src="/Gemini_Generated_Image_8fcq2h8fcq2h8fcq.webp" height="40" alt="" />
