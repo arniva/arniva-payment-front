@@ -18,6 +18,7 @@
 	}
 
 	function formatYearToLastTwoDigits(year: string): string {
+		if (!year) return '';
 		if (year.length === 4) {
 			return year.slice(-2); // Get last two digits
 		}

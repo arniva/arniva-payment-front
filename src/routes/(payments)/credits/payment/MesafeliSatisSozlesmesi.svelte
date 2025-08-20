@@ -1,5 +1,5 @@
 <script lang="ts">
-	let { form, selectedPackage } = $props();
+	let { pageData, selectedPackage } = $props();
 
 	function formatTurkishCurrency(value: number): string {
 		if (!value) return '';
@@ -69,8 +69,8 @@
 
 <h2>3. ALICI BİLGİLERİ (Bundan sonra ALICI olarak anılacaktır.)</h2>
 
-<p><strong>Adı/Soyadı/Ünvanı :</strong> {form?.data?.unvan || '?'}</p>
-<p><strong>Adresi :</strong> {form?.data?.adres || '?'}</p>
+<p><strong>Adı/Soyadı/Ünvanı :</strong> {pageData?.unvan || '?'}</p>
+<p><strong>Adresi :</strong> {pageData?.adres || '?'}</p>
 
 <h2>4. SÖZLEŞME KONUSU ÜRÜN/ÜRÜNLER BİLGİLERİ</h2>
 
@@ -310,7 +310,7 @@
 *****************************
 
 <h4>ALICI</h4>
-<p><strong>Adı/Soyadı/Ünvan :</strong> {form?.data?.unvan || '?'}</p>
+<p><strong>Adı/Soyadı/Ünvan :</strong> {pageData?.unvan || '?'}</p>
 <p><strong>Tarih :</strong> {today}</p>
 
 <style>

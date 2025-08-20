@@ -16,7 +16,7 @@
 			<h5 class="page-subtitle text-muted">{page?.data?.subtitle}</h5>
 		</div>
 	</div>
-	<a href="/" class="btn btn-outline-secondary d-none d-md-block">
+	<a href="/" target="_self" class="btn btn-outline-secondary d-none d-md-block">
 		<i class="bi bi-arrow-left"></i>
 		Ana Sayfa</a
 	>
