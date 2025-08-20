@@ -7,12 +7,17 @@
 	import { calculateInstallmentAmount, formatTurkishCurrency } from './functions.svelte';
 	import InstallmentOptionsBox from './InstallmentOptionsBox.svelte';
 	import YearSelect from './YearSelect.svelte';
+	import type { Package } from '../types';
 
 	let { data, form }: PageProps = $props();
 	let confirmCheck = $state(false);
-	let yearComponent;
-	let selectedPackage = form?.data?.selectedPackageId
-		? data.packages.find((pkg) => pkg.id === form.data.selectedPackageId)
+	let yearComponent: YearSelect;
+	let cvcInput: HTMLInputElement | null;
+
+	let pageData = form?.data || data?.urlData || null;
+
+	let selectedPackage = pageData?.selectedPackageId
+		? data.packages.find((pkg: Package) => pkg.id === pageData.selectedPackageId)
 		: null;
 
 	let formData = $state({
@@ -49,31 +54,7 @@
 		{ value: 10, label: '10 Taksit', newPricePercentage: 145 }
 	];
 
-	// function calculateInstallmentAmount(installment) {
-	// 	if (!selectedPackage) return '';
-
-	// 	let total = selectedPackage.total;
-	// 	let newPricePercentage =
-	// 		installmentOptions.find((option) => option.value === installment)?.newPricePercentage || 100;
-	// 	let installmentAmount = (total * newPricePercentage) / 100 / installment;
-	// 	let totalAmount = installmentAmount * installment;
-	// 	return {
-	// 		totalAmount: totalAmount,
-	// 		installmentAmount: installmentAmount
-	// 	};
-	// }
-
-	// function getFormattedAndCalculateInstallmentAmount(installment: number): string {
-	// 	let calculatedAmounts = calculateInstallmentAmount(installment);
-	// 	return (
-	// 		formatTurkishCurrency(calculatedAmounts.installmentAmount) +
-	// 		' (' +
-	// 		formatTurkishCurrency(calculatedAmounts.totalAmount) +
-	// 		')'
-	// 	);
-	// }
-
-	function handleCardInput(event: Event) {
+	function handleCardInput(event: InputEvent) {
 		let input = event.target as HTMLInputElement;
 		let value = input.value.replace(/\D/g, ''); // Remove non-digits
 		value = value.slice(0, 16); // Limit to 16 digits
@@ -97,46 +78,30 @@
 		formData.cvc = value;
 	}
 
-	let valid = $derived.by(() => {
-		return (
-			formData.name.trim() !== '' &&
-			formData.no.replace(/\s/g, '').length === 16 &&
-			formData.cvc.length === 3 &&
-			formData.validUntilMonth !== '' &&
-			formData.validUntilYear !== ''
-		);
-	});
-
 	function formatThousands(value: number): string {
 		if (!value) return '';
 		return value.toLocaleString('tr-TR');
 	}
 
 	onMount(() => {
-		if (!form || !form?.data?.selectedPackageId || !form?.data?.vkn || !form?.data?.unvan) {
+		if (!pageData || !pageData?.selectedPackageId || !pageData?.vkn || !pageData?.unvan) {
 			console.error('No package selected or form data is missing.');
 			window.location.href = '/credits';
 		}
 	});
-
-	// function openInstallmentModal() {
-	// 	// Logic to open the installment modal
-	// 	const modal = new bootstrap.Modal(document.getElementById('installmentModal'));
-	// 	modal.show();
-	// }
 </script>
 
 <div class="row justify-content-center">
 	<div class="col-12 col-md-9">
 		<form action="/credits/payment?/pay" method="POST">
-			<input type="hidden" name="selectedPackageId" value={form?.data?.selectedPackageId} />
-			<input type="hidden" name="vkn" value={form?.data?.vkn} />
-			<input type="hidden" name="unvan" value={form?.data?.unvan} />
-			<input type="hidden" name="description" value={form?.data?.description} />
-			<input type="hidden" name="adres" value={form?.data?.adres} />
-			<input type="hidden" name="il" value={form?.data?.il} />
-			<input type="hidden" name="ilce" value={form?.data?.ilce} />
-			<input type="hidden" name="postakodu" value={form?.data?.postakodu} />
+			<input type="hidden" name="selectedPackageId" value={pageData?.selectedPackageId} />
+			<input type="hidden" name="vkn" value={pageData?.vkn} />
+			<input type="hidden" name="unvan" value={pageData?.unvan} />
+			<input type="hidden" name="description" value={pageData?.description} />
+			<input type="hidden" name="adres" value={pageData?.adres} />
+			<input type="hidden" name="il" value={pageData?.il} />
+			<input type="hidden" name="ilce" value={pageData?.ilce} />
+			<input type="hidden" name="postakodu" value={pageData?.postakodu} />
 
 			<div class="row">
 				<!-- This will be col-8 on desktop, but appear second on mobile -->
@@ -176,7 +141,7 @@
 							id="no"
 							placeholder="XXXX XXXX XXXX XXXX"
 							maxlength="19"
-							oninput={handleCardInput}
+							oninput={(e) => handleCardInput(e as unknown as InputEvent)}
 							required
 							autocomplete="cc-number"
 						/>
@@ -193,7 +158,7 @@
 									id="validUntilMonth"
 									required
 									onchange={() => {
-										yearComponent && yearComponent.open();
+										if (yearComponent) yearComponent.open();
 									}}
 								>
 									<option value="">Ay seçiniz</option>
@@ -212,13 +177,17 @@
 								</select>
 							</div>
 							<div class="mb-3">
-								<!-- <YearSelect
+								<YearSelect
+									onChange={() => {
+										console.log('changed');
+										if (cvcInput) cvcInput.focus();
+									}}
 									bind:this={yearComponent}
 									{maxYear}
 									{minYear}
 									bind:value={formData.validUntilYear}
-								/> -->
-								<label for="validUntilYear" class="form-label">Yıl <code>*</code></label>
+								/>
+								<!-- <label for="validUntilYear" class="form-label">Yıl <code>*</code></label>
 								<select
 									bind:value={formData.validUntilYear}
 									name="validUntilYear"
@@ -229,13 +198,14 @@
 									{#each Array.from({ length: maxYear - minYear + 1 }, (_, i) => minYear + i) as year (year)}
 										<option value={year.toString()}>{year}</option>
 									{/each}
-								</select>
+								</select> -->
 							</div>
 						</div>
 						<div>
 							<div class="mb-3">
 								<label for="cvc" class="form-label">CVC <code>*</code></label>
 								<input
+									bind:this={cvcInput}
 									bind:value={formData.cvc}
 									name="cvc"
 									type="text"
@@ -279,14 +249,16 @@
 									selectedPackage,
 									installmentOptions
 								)}
-								<div class="mb-3">
-									<h2 class="mb-0">
-										{formatTurkishCurrency(newAmount.totalAmount)}
-									</h2>
-									<span class="text-muted"
-										>{formatTurkishCurrency(newAmount.installmentAmount)} x {formData.installment} Taksit</span
-									>
-								</div>
+								{#if typeof newAmount === 'object' && newAmount !== null}
+									<div class="mb-3">
+										<h2 class="mb-0">
+											{formatTurkishCurrency(newAmount.totalAmount)}
+										</h2>
+										<span class="text-muted">
+											{formatTurkishCurrency(newAmount.installmentAmount)} x {formData.installment} Taksit
+										</span>
+									</div>
+								{/if}
 							{/if}
 
 							<div class="d-flex mb-3 align-items-start">
@@ -425,7 +397,7 @@
 	</div>
 	<div class="offcanvas-body p-3 p-md-4">
 		{#if formData && selectedPackage}
-			<MesafeliSatisSozlesmesi {form} {selectedPackage} />
+			<MesafeliSatisSozlesmesi {pageData} {selectedPackage} />
 		{/if}
 	</div>
 </div>
@@ -456,6 +428,15 @@
 	@media (max-width: 768px) {
 		#mesafeliSatisSozlesmesi,
 		#iptalVeIadeKosullari {
+			width: 100%;
+		}
+	}
+	#cvc {
+		width: 80px;
+	}
+	/* Media Queries */
+	@media (max-width: 768px) {
+		#cvc {
 			width: 100%;
 		}
 	}

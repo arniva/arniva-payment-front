@@ -1,8 +1,36 @@
 import type { PageServerLoad } from './$types';
 import { redirect } from '@sveltejs/kit';
+import type { Package } from '../types';
+/*
+/credits/payment?selectedPackageId=5545cad8-7958-4ece-aa62-355814829bd4&vkn=12312312312&unvan=Test%20Adı&description=asdfasdf&adres=Test%20Adresi&il=Test%20İli&ilce=Test%20İlçesi&postakodu=12345
 
-export const load = (async () => {
+data {
+  selectedPackageId: '5545cad8-7958-4ece-aa62-355814829bd4',
+  vkn: '12312312312',
+  unvan: 'Test Adı',
+  description: 'asdfasdf',
+  adres: 'Test Adresi',
+  il: 'Test İli',
+  ilce: 'Test İlçesi',
+  postakodu: '12345'
+}
+
+*/
+
+export const load = (async ({ url }) => {    
+    let urlData = {
+      selectedPackageId:url.searchParams.get('selectedPackageId') || '',
+      vkn: url.searchParams.get('vkn') || '',
+      unvan: url.searchParams.get('unvan') || '',
+      description: url.searchParams.get('description') || '',
+      adres: url.searchParams.get('adres') || '',
+      il: url.searchParams.get('il') || '',
+      ilce: url.searchParams.get('ilce') || '',
+      postakodu: url.searchParams.get('postakodu') || ''
+    }
+
     return {
+        urlData,
         custom: {
             title: 'Ödeme',
             nexturl: '/',
@@ -14,11 +42,8 @@ export const load = (async () => {
 export const actions = {
   next: async ({ request }) => {
     const formData = await request.formData();
-    // Process your object here
-    // adres il ilce postakodu
-    return {
-      success: true,
-      data: {
+
+    const data = {
         selectedPackageId: formData.get('selectedPackageId'),
         vkn: formData.get('vkn'),
         unvan: formData.get('unvan'),
@@ -28,6 +53,10 @@ export const actions = {
         ilce: formData.get('ilce'),
         postakodu: formData.get('postakodu')
       }
+
+    return {
+      success: true,
+      data
     };
   },
   pay: async ({ request, fetch }) => {
@@ -51,7 +80,7 @@ export const actions = {
         }
     }
 
-    const price = packages.find(pkg => pkg.id === selectedPackageId)?.total || 0;
+    const price = packages.find((pkg: Package) => pkg.id === selectedPackageId)?.total || 0;
 
     const cardBody = {
       no: formData.get('no'),
@@ -87,7 +116,7 @@ export const actions = {
 
     const requiredFields = ['vtc', 'unvan', 'paket_id', 'kart4', 'kartsahibi', 'adres', 'il', 'ilce', 'postakodu'];
 
-    const allFieldsValid = requiredFields.every(field => postBody[field] !== undefined && postBody[field] !== null && (typeof postBody[field] === 'number' || postBody[field] !== ''));
+        const allFieldsValid = (requiredFields as Array<keyof typeof postBody>).every(field => postBody[field] !== undefined && postBody[field] !== null && (typeof postBody[field] === 'number' || postBody[field] !== ''));
 
     // const allFieldsValid = Object.values(postBody).every(value => value !== undefined && value !== null && (typeof value === 'number' || value !== ''));
     console.log("allFieldsValid:", allFieldsValid)

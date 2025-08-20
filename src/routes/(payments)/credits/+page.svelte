@@ -1,9 +1,10 @@
 <script lang="ts">
 	import type { PageProps } from './$types'; // removed unused import
+	import type { Package } from './types';
 	let { data }: PageProps = $props(); // removed unused variable
 	let packageWarningModal: HTMLDivElement | null;
 
-	let selected: null | number = $state(null);
+	let selected: string | null = $state(null);
 
 	function formatTurkishCurrency(value: number): string {
 		return (
@@ -18,7 +19,8 @@
 		return value.toLocaleString('tr-TR');
 	}
 
-	function getPackages(p, type) {
+	function getPackages(p: Package[], type: number) {
+		console.log('p', p);
 		return p.filter((pkg) => pkg.type === type);
 	}
 </script>
