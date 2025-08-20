@@ -1,0 +1,21 @@
+name: Dockerize Test Version and Push to Docker Hub
+on:
+  push:
+    branches:
+      - dev
+jobs:
+  build-container:
+    name: Build and Push Docker Container
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: build image
+        run: docker build -t ${{github.repository}}:test-latest .
+      - name: push image
+        run: |
+          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u ${{secrets.DOCKERHUB_USER}} --password-stdin
+          docker push ${{github.repository}}:test-latest
+          docker logout
+      - name: clear cache
+        run: docker system prune -f
