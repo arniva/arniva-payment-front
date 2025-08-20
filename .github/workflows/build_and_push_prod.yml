@@ -1,0 +1,48 @@
+name: Dockerize Production Version and Push to Docker Hub
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-container:
+    name: Build and Push Docker Container
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PR_SECRET }}
+          repository: ${{github.repository}}
+      - name: Set up Git
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+
+      - name: Get current date and time
+        id: date
+        run: echo "TAG_DATE=$(date +'%Y-%m-%d_%H-%M-%S')" >> $GITHUB_ENV
+      - name: Create and push tag
+        env:
+          TAG_DATE: ${{ env.TAG_DATE }}
+        run: |
+          TAG="release-${TAG_DATE}"
+          git tag -a "$TAG" -m "Automated tag for main at $TAG_DATE"
+          git push origin "$TAG"
+
+      - name: build image
+        env:
+          TAG_DATE: ${{ env.TAG_DATE }}
+        run: |
+          docker build -t ${{github.repository}}:latest .
+          docker tag ${{github.repository}}:latest ${{github.repository}}:${TAG_DATE}
+      - name: push image
+        env:
+          TAG_DATE: ${{ env.TAG_DATE }}
+        run: |
+          echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u ${{secrets.DOCKERHUB_USER}} --password-stdin
+          docker push ${{github.repository}}:latest && docker push ${{github.repository}}:${TAG_DATE}
+          docker logout
+      - name: clear cache
+        run: docker system prune -f
