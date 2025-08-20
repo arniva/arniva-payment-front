@@ -1,9 +1,10 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
+	import type { Package } from '../types';
 	let { data, form }: PageProps = $props();
 	import { onMount } from 'svelte';
 	let selectedPackage = form?.data?.selectedPackageId
-		? data.packages.find((pkg) => pkg.id === form.data.selectedPackageId)
+		? data.packages.find((pkg: Package) => pkg.id === form.data.selectedPackageId)
 		: null;
 
 	let formData = $state({

@@ -5,8 +5,9 @@ export const load = (async ({ fetch }) => {
     let packages = []
 
     const packagesRes = await fetch('https://payment-api.arniva.tr/v1/paketler')
-
+    console.log("Fetching packages...", packagesRes);
     if(packagesRes.ok) {
+        console.log("=========================1")
         const json = await packagesRes.json();
         if(json && json.code === 0 && json.data?.length) {
             packages = json.data.map((pkg: any) => ({
@@ -17,6 +18,10 @@ export const load = (async ({ fetch }) => {
                 type: pkg.tip
             }));
         }
+    } else if(packagesRes) {
+        const errorJson = await packagesRes.json();
+        if(errorJson && (errorJson.code === 1 || errorJson.code === 2) && errorJson.message)
+        console.log("=========================2", errorJson.message);
     }
 
     return {
