@@ -54,8 +54,8 @@
 						</tr>
 						<tr>
 							<th>Kontör Adedi</th>
-							<th class="d-none d-md-table-cell">Birim Fiyatı</th>
-							<th>Tutarı</th>
+							<th class="d-none d-md-table-cell text-end pe-2">Birim Fiyatı</th>
+							<th class="text-end pe-2">Tutarı</th>
 							<th class="text-center">Seçiniz</th>
 						</tr>
 					</thead>
@@ -63,8 +63,10 @@
 						{#each getPackages(data.packages, 1) as pkg (pkg.id)}
 							<tr class="cursor-pointer {selected === pkg.id ? 'table-primary' : ''}">
 								<td>{formatThousands(pkg.amount)} Adet</td>
-								<td class="d-none d-md-table-cell">{formatTurkishCurrency(pkg.unitPrice)}</td>
-								<td>{formatTurkishCurrency(pkg.total)}</td>
+								<td class="d-none d-md-table-cell text-end pe-2"
+									>{formatTurkishCurrency(pkg.unitPrice)}</td
+								>
+								<td class="text-end pe-2">{formatTurkishCurrency(pkg.total)}</td>
 								<td class="text-center">
 									<button
 										type="button"
@@ -93,8 +95,8 @@
 						</tr>
 						<tr>
 							<th>Kontör Adedi</th>
-							<th class="d-none d-md-table-cell">Birim Fiyatı</th>
-							<th>Tutarı</th>
+							<th class="d-none d-md-table-cell text-end pe-2">Birim Fiyatı</th>
+							<th class="text-end pe-2">Tutarı</th>
 							<th class="text-center">Seçiniz</th>
 						</tr>
 					</thead>
@@ -102,8 +104,10 @@
 						{#each getPackages(data.packages, 2) as pkg (pkg.id)}
 							<tr class="cursor-pointer {selected === pkg.id ? 'table-primary' : ''}">
 								<td>{formatThousands(pkg.amount)} Adet</td>
-								<td class="d-none d-md-table-cell">{formatTurkishCurrency(pkg.unitPrice)}</td>
-								<td>{formatTurkishCurrency(pkg.total)}</td>
+								<td class="d-none d-md-table-cell text-end pe-2"
+									>{formatTurkishCurrency(pkg.unitPrice)}</td
+								>
+								<td class="text-end pe-2">{formatTurkishCurrency(pkg.total)}</td>
 								<td class="text-center">
 									<button
 										type="button"
