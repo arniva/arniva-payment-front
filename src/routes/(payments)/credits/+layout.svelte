@@ -66,11 +66,15 @@
 				paketleri için gerekli kontörleri kolayca satın alabilirsiniz.
 				<code> Tüm fiyatlara KDV dahildir. </code>
 			</p>
-			<div class="d-flex justify-content-end">
-				<img src="/Gemini_Generated_Image_8fcq2h8fcq2h8fcq.webp" height="40" alt="" />
-			</div>
 		</div>
 	</div>
+</div>
+
+<div class="d-flex justify-content-between mt-3">
+	<a class="text-decoration-none text-secondary fs-6" href="/gizlilik_politikasi" target="_blank"
+		>Gizlilik Politikası</a
+	>
+	<img src="/Gemini_Generated_Image_8fcq2h8fcq2h8fcq.webp" height="40" alt="" />
 </div>
 
 <style>
