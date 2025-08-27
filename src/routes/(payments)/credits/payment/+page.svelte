@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
-	import { onMount } from 'svelte';
 	import CreditCard from './CreditCard.svelte';
 	import MesafeliSatisSozlesmesi from './MesafeliSatisSozlesmesi.svelte';
 	import IptalVeIadeKosullari from './IptalVeIadeKosullari.svelte';
@@ -14,11 +13,14 @@
 	let yearComponent: YearSelect;
 	let cvcInput: HTMLInputElement | null;
 
-	let pageData = form?.data || data?.urlData || null;
+	let pageData = $state(data?.urlData || null);
+	const encodedPageData = $derived(btoa(encodeURIComponent(JSON.stringify(pageData))));
 
-	let selectedPackage = pageData?.selectedPackageId
-		? data.packages.find((pkg: Package) => pkg.id === pageData.selectedPackageId)
-		: null;
+	let selectedPackage = $derived(
+		pageData?.selectedPackageId
+			? data.packages.find((pkg: Package) => pkg.id === pageData.selectedPackageId)
+			: null
+	);
 
 	let formData = $state({
 		name: '',
@@ -26,7 +28,8 @@
 		cvc: '',
 		validUntilMonth: '',
 		validUntilYear: '',
-		installment: 1
+		installment: 1,
+		price: 0
 	});
 
 	let maxYear = new Date().getFullYear() + 10;
@@ -83,26 +86,57 @@
 		return value.toLocaleString('tr-TR');
 	}
 
-	onMount(() => {
-		if (!pageData || !pageData?.selectedPackageId || !pageData?.vkn || !pageData?.unvan) {
-			console.error('No package selected or form data is missing.');
-			window.location.href = '/credits';
+	let errorMessage = $state(null);
+
+	$effect(() => {
+		if (form && form.message) {
+			errorMessage = form.message;
+			setTimeout(() => {
+				errorMessage = null;
+			}, 5000);
+		}
+		if (form && form.data?.cardBody) {
+			const cardBody = form.data.cardBody;
+			formData = {
+				name: typeof cardBody.name === 'string' ? cardBody.name : '',
+				no: typeof cardBody.no === 'string' ? cardBody.no : '',
+				cvc: typeof cardBody.cvc === 'string' ? cardBody.cvc : '',
+				validUntilMonth:
+					typeof cardBody.validUntilMonth === 'string' ? cardBody.validUntilMonth : '',
+				validUntilYear: typeof cardBody.validUntilYear === 'string' ? cardBody.validUntilYear : '',
+				installment: typeof cardBody.installment === 'string' ? Number(cardBody.installment) : 1,
+				price: typeof cardBody.price === 'string' ? Number(cardBody.price) : 0
+			};
+		}
+		if (form && form.data?.encodedPageData) {
+			pageData = form.data.encodedPageData;
 		}
 	});
 </script>
 
+{#if errorMessage}
+	<div
+		class="alert alert-danger mb-4 position-fixed top-0 end-0 mt-0 me-0 w-100 py-4 text-center"
+		role="alert"
+	>
+		{errorMessage}
+	</div>
+{/if}
+
 <div class="row justify-content-center">
 	<div class="col-12 col-md-9">
 		<form action="/credits/payment?/pay" method="POST">
-			<input type="hidden" name="selectedPackageId" value={pageData?.selectedPackageId} />
+			<!-- <input type="hidden" name="selectedPackageId" value={pageData?.selectedPackageId} />
 			<input type="hidden" name="vkn" value={pageData?.vkn} />
 			<input type="hidden" name="unvan" value={pageData?.unvan} />
 			<input type="hidden" name="description" value={pageData?.description} />
 			<input type="hidden" name="adres" value={pageData?.adres} />
 			<input type="hidden" name="il" value={pageData?.il} />
 			<input type="hidden" name="ilce" value={pageData?.ilce} />
-			<input type="hidden" name="postakodu" value={pageData?.postakodu} />
-
+			<input type="hidden" name="postakodu" value={pageData?.postakodu} /> -->
+			<input type="hidden" name="installment" value={formData.installment} />
+			<input type="hidden" name="validUntilYear" value={formData.validUntilYear} />
+			<input type="hidden" name="encoded" value={encodedPageData} />
 			<div class="row">
 				<!-- This will be col-8 on desktop, but appear second on mobile -->
 				<div class="col-12 col-md-8 order-1 order-md-2 pe-4 mb-4 mb-md-0">
@@ -179,7 +213,6 @@
 							<div class="mb-3">
 								<YearSelect
 									onChange={() => {
-										console.log('changed');
 										if (cvcInput) cvcInput.focus();
 									}}
 									bind:this={yearComponent}
@@ -187,18 +220,6 @@
 									{minYear}
 									bind:value={formData.validUntilYear}
 								/>
-								<!-- <label for="validUntilYear" class="form-label">Yıl <code>*</code></label>
-								<select
-									bind:value={formData.validUntilYear}
-									name="validUntilYear"
-									class="form-select"
-									id="validUntilYear"
-								>
-									<option value="">Yıl seçiniz</option>
-									{#each Array.from({ length: maxYear - minYear + 1 }, (_, i) => minYear + i) as year (year)}
-										<option value={year.toString()}>{year}</option>
-									{/each}
-								</select> -->
 							</div>
 						</div>
 						<div>

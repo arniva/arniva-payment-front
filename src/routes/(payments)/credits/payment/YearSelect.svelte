@@ -33,7 +33,6 @@
 	});
 
 	export function open() {
-		console.log('opening');
 		if (dropdownEl && dd) {
 			// Ensure Bootstrap knows this dropdown should respond to outside clicks
 			dd._config.autoClose = true;
@@ -46,10 +45,6 @@
 			}, 100);
 			if (inputEl) inputEl.focus();
 		}
-	}
-
-	function trigger() {
-		console.log('triggering');
 	}
 
 	function handleInput(event: Event) {
@@ -78,10 +73,6 @@
 					const validYearStr = validYear.toString();
 					return validYearStr.startsWith(inputValue);
 				});
-
-				console.log(
-					`Input: "${inputValue}", Valid years: [${validYears.join(', ')}], Could be valid: ${couldBeValid}`
-				);
 
 				if (!couldBeValid) {
 					// Keep the previous valid input instead of clearing completely
@@ -213,9 +204,6 @@
 	<input
 		class="form-control"
 		type="text"
-		onfocus={trigger}
-		onmousedown={trigger}
-		onclick={trigger}
 		oninput={handleInput}
 		onkeydown={handleKeyDown}
 		bind:value

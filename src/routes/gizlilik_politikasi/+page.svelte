@@ -1,9 +1,3 @@
-<script lang="ts">
-	import type { PageProps } from '../(payments)/gizlilik_politikasi/$types';
-
-	let { data }: PageProps = $props();
-</script>
-
 <h1>Gizlilik ve Güvenlik Politikası</h1>
 <p>
 	<strong>Arniva</strong> olarak, <a href="https://odeme.arniva.tr">https://odeme.arniva.tr</a>

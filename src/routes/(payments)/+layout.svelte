@@ -2,7 +2,7 @@
 	import type { LayoutProps } from './$types';
 	import { page } from '$app/state';
 
-	let { data, children }: LayoutProps = $props();
+	let { children }: LayoutProps = $props();
 </script>
 
 <div class="d-flex align-items-start justify-content-between">

@@ -1,14 +1,29 @@
-export function calculateInstallmentAmount(installment, selectedPackage, installmentOptions) {
+export interface InstallmentOption {
+    value: number;
+    label: string;
+    newPricePercentage: number;
+}
+
+export interface Package {
+    total: number;
+    // Add other properties as needed
+}
+
+export function calculateInstallmentAmount(
+    installment: number,
+    selectedPackage: Package | null,
+    installmentOptions: InstallmentOption[]
+): { totalAmount: number; installmentAmount: number } | string {
     if (!selectedPackage) return '';
 
-    let total = selectedPackage.total;
-    let newPricePercentage =
-        installmentOptions.find((option) => option.value === installment)?.newPricePercentage || 100;
-    let installmentAmount = (total * newPricePercentage) / 100 / installment;
-    let totalAmount = installmentAmount * installment;
+    const total = selectedPackage.total;
+    const newPricePercentage =
+        installmentOptions.find((option: InstallmentOption) => option.value === installment)?.newPricePercentage || 100;
+    const installmentAmount = (total * newPricePercentage) / 100 / installment;
+    const totalAmount = installmentAmount * installment;
     return {
-        totalAmount: totalAmount,
-        installmentAmount: installmentAmount
+        totalAmount,
+        installmentAmount
     };
 }
 
