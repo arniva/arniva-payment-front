@@ -1,3 +1,5 @@
+# README
+
 1. First import template repositroy to another place
 2. make default branch is dev
 3. Automatically delete head branches 
