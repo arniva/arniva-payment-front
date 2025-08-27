@@ -126,14 +126,6 @@
 <div class="row justify-content-center">
 	<div class="col-12 col-md-9">
 		<form action="/credits/payment?/pay" method="POST">
-			<!-- <input type="hidden" name="selectedPackageId" value={pageData?.selectedPackageId} />
-			<input type="hidden" name="vkn" value={pageData?.vkn} />
-			<input type="hidden" name="unvan" value={pageData?.unvan} />
-			<input type="hidden" name="description" value={pageData?.description} />
-			<input type="hidden" name="adres" value={pageData?.adres} />
-			<input type="hidden" name="il" value={pageData?.il} />
-			<input type="hidden" name="ilce" value={pageData?.ilce} />
-			<input type="hidden" name="postakodu" value={pageData?.postakodu} /> -->
 			<input type="hidden" name="installment" value={formData.installment} />
 			<input type="hidden" name="validUntilYear" value={formData.validUntilYear} />
 			<input type="hidden" name="encoded" value={encodedPageData} />
@@ -315,7 +307,12 @@
 								disabled={!cardValid || !confirmCheck}
 								>Ödeme Yap <i class="bi bi-arrow-right"></i></button
 							>
-
+							<div class="d-flex align-items-center justify-content-between mb-3">
+								<span class="text-muted fs-6">Paket</span>
+								<strong class="text-end fs-6"
+									>{selectedPackage.type === 1 ? 'E-Fatura Paketi' : 'E-Adisyon Paketi'}</strong
+								>
+							</div>
 							<div class="d-flex align-items-center justify-content-between mb-3">
 								<span class="text-muted fs-6">Kontör Adedi</span>
 								<strong class="text-end fs-6">{formatThousands(selectedPackage.amount)}</strong>

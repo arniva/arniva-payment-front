@@ -5,14 +5,15 @@
 	let { data }: PageProps = $props();
 	let { selectedPackage } = data;
 
+	let formattedDescription = `${selectedPackage?.amount} adet ${selectedPackage?.type === 1 ? 'E-Fatura' : 'E-Adisyon'} kontör paketi ödemesidir`;
+
 	let formData = $state({
 		vkn: data?.encodedData?.vkn || '',
 		unvan: data?.encodedData?.unvan || '',
 		adres: data?.encodedData?.adres || '',
 		il: data?.encodedData?.il || '',
 		ilce: data?.encodedData?.ilce || '',
-		postakodu: data?.encodedData?.postakodu || '',
-		description: data?.encodedData?.description || '',
+		description: data?.encodedData?.description || formattedDescription,
 		selectedPackageId: selectedPackage?.id || ''
 	});
 
@@ -26,8 +27,7 @@
 			formData.unvan.trim() !== '' &&
 			formData.adres.trim() !== '' &&
 			formData.il.trim() !== '' &&
-			formData.ilce.trim() !== '' &&
-			formData.postakodu.trim() !== ''
+			formData.ilce.trim() !== ''
 		);
 	});
 
@@ -53,7 +53,6 @@
 				formData.adres = json.data.adres;
 				formData.il = json.data.il;
 				formData.ilce = json.data.ilce;
-				formData.postakodu = json.data.postakodu;
 			}
 		}
 	}
@@ -112,6 +111,9 @@
 		const url = `/credits/payment?data=${encoded}`;
 		goto(url);
 	}
+
+	$inspect('selectedPackage', selectedPackage);
+	console.log('data', data);
 </script>
 
 <div class="row justify-content-center">
@@ -183,17 +185,6 @@
 							placeholder="İlçe"
 						/>
 					</div>
-					<div class="col-12 col-md-4">
-						<label for="postakodu" class="form-label">Posta Kodu <code>*</code></label>
-						<input
-							bind:value={formData.postakodu}
-							name="postakodu"
-							type="text"
-							class="form-control"
-							id="postakodu"
-							placeholder="Posta Kodu"
-						/>
-					</div>
 				</div>
 				<div class="mb-3">
 					<label for="description" class="form-label">Açıklama</label>
@@ -221,6 +212,12 @@
 							disabled={!valid}>Ödemeye Geç <i class="bi bi-arrow-right"></i></button
 						>
 
+						<div class="d-flex align-items-center justify-content-between mb-3">
+							<span class="text-muted fs-6">Paket</span>
+							<strong class="text-end fs-6"
+								>{selectedPackage.type === 1 ? 'E-Fatura Paketi' : 'E-Adisyon Paketi'}</strong
+							>
+						</div>
 						<div class="d-flex align-items-center justify-content-between mb-3">
 							<span class="text-muted fs-6">Kontör Adedi</span>
 							<strong class="text-end fs-6">{formatThousands(selectedPackage.amount)}</strong>

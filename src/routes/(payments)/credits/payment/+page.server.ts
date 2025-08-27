@@ -88,10 +88,9 @@ export const actions = {
       adres: encodedPageData.adres,
       il: encodedPageData.il,
       ilce: encodedPageData.ilce,
-      postakodu: encodedPageData.postakodu
     }
 
-    const requiredFields = ['vtc', 'unvan', 'paket_id', 'kart4', 'kartsahibi', 'adres', 'il', 'ilce', 'postakodu'];
+    const requiredFields = ['vtc', 'unvan', 'paket_id', 'kart4', 'kartsahibi', 'adres', 'il', 'ilce'];
 
     const allFieldsValid = (requiredFields as Array<keyof typeof postBody>).every(field => postBody[field] !== undefined && postBody[field] !== null && (typeof postBody[field] === 'number' || postBody[field] !== ''));
 
