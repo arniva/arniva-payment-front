@@ -1,5 +1,4 @@
 <script lang="ts">
-	import favicon from '$lib/assets/favicon.svg';
 	import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.js?url';
 	import { Navbar } from '@components';
 	import '@styles';
@@ -7,7 +6,7 @@
 </script>
 
 <svelte:head>
-	<link rel="icon" href={favicon} />
+	<link rel="icon" href="/favicon.ico" />
 	<script src={bootstrap} defer></script>
 </svelte:head>
 <Navbar />

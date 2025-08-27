@@ -12,7 +12,7 @@
 <ul>
 	<li>Vergi Kimlik Numarası (VKN) veya Türkiye Cumhuriyeti Kimlik Numarası (TC Kimlik No)</li>
 	<li>Ünvan (Ad Soyad veya Şirket Adı)</li>
-	<li>Adres, İl, İlçe, Posta Kodu</li>
+	<li>Adres, İl, İlçe</li>
 	<li>Açıklama</li>
 	<li>Kart Bilgileri: Kart Sahibi, Kart Numarası, Son Kullanma Tarihi (Ay/Yıl), CVC</li>
 </ul>
