@@ -38,25 +38,6 @@
 	});
 </script>
 
-<!-- <div class="card-container">
-	<div class="credit-card">
-		<div class="card-content">
-			<div>
-				<div class="card-chip"></div>
-				<div class="card-number">1234 5678 9012 3456</div>
-				<div class="card-info">
-					<div class="card-cvc">123</div>
-					<div class="card-expiry">08/25</div>
-				</div>
-			</div>
-			<div class="card-bottom">
-				<img class="card-logo" src="/troy.png" alt="Card Logo" />
-				<div class="card-holder">John Doe</div>
-			</div>
-		</div>
-	</div>
-</div> -->
-
 <div class="credit-card-container ratio ratio-16x9 mb-4 d-none d-md-block">
 	<div
 		class="card credit-card p-5 d-flex flex-column align-items-start justify-content-between gap-3 rounded-4"
