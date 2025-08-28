@@ -48,6 +48,10 @@ export const actions = {
       }
     }
 
+    if(!encodedPageData) {
+      redirect(302, '/credits');
+    }
+
     const price = packages.find((pkg: Package) => pkg.id === encodedPageData.selectedPackageId)?.total || 0;
 
     const cardBody = {
