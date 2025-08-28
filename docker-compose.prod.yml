@@ -1,0 +1,14 @@
+version: '3.8'
+
+# Production overrides
+services:
+  arniva-payment:
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - ORIGIN=${ORIGIN:-https://odeme.arniva.tr}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.arniva-payment.rule=Host(`payment.arniva.com`)"
+      - "traefik.http.services.arniva-payment.loadbalancer.server.port=3000"

@@ -28,7 +28,10 @@ export const load = (async ({ url }) => {
 }) satisfies PageServerLoad;
 
 export const actions = {
-
+  // TODO: Form submit URL'si içinde query parameter ile data yok. 
+  // Normalde sorun olmuyor, çünkü bu form response ile gönderiliyor.
+  // Ama sayfa yenilendiğinde bu data kayboluyor. Bu yüzden bunu bir kontrol etmemiz lazım, ve one göre ya eklememiz,
+  // ya da kullanıcıyı başka yere yönlendirmemiz lazım.
   pay: async ({ request }) => {
     const formData = await request.formData();
     const encodedPageDataRaw = formData.get('encoded');
