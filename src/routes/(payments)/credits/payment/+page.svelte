@@ -7,6 +7,7 @@
 	import InstallmentOptionsBox from './InstallmentOptionsBox.svelte';
 	import YearSelect from './YearSelect.svelte';
 	import type { Package } from '../types';
+	import { toast } from '@ruzgardogu/utils';
 
 	let { data, form }: PageProps = $props();
 	let confirmCheck = $state(false);
@@ -86,14 +87,17 @@
 		return value.toLocaleString('tr-TR');
 	}
 
-	let errorMessage = $state(null);
+	let errorMessage = $state('');
+	let lastShownMessage = $state('');
 
 	$effect(() => {
-		if (form && form.message) {
+		if (form && form.message && form.message !== lastShownMessage) {
 			errorMessage = form.message;
-			setTimeout(() => {
-				errorMessage = null;
-			}, 5000);
+			if (errorMessage) {
+				toast.danger(errorMessage);
+				lastShownMessage = errorMessage;
+				errorMessage = '';
+			}
 		}
 		if (form && form.data?.cardBody) {
 			const cardBody = form.data.cardBody;
@@ -114,14 +118,14 @@
 	});
 </script>
 
-{#if errorMessage}
+<!-- {#if errorMessage}
 	<div
 		class="alert alert-danger mb-4 position-fixed top-0 end-0 mt-0 me-0 w-100 py-4 text-center"
 		role="alert"
 	>
 		{errorMessage}
 	</div>
-{/if}
+{/if} -->
 
 <div class="row justify-content-center">
 	<div class="col-12 col-md-9">

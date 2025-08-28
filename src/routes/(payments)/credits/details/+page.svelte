@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
 	import { goto } from '$app/navigation';
+	import { spinner } from '@ruzgardogu/utils';
 
 	let { data }: PageProps = $props();
 	let { selectedPackage } = data;
@@ -45,15 +46,33 @@
 	}
 
 	async function handleVknApiCall(vknValue: string) {
-		const res = await fetch(`https://payment-api.arniva.tr/v1/mukellefler/${vknValue}`);
-		if (res.ok) {
-			const json = await res.json();
-			if (json && json.data && json.code === 0) {
-				formData.unvan = json.data.adi;
-				formData.adres = json.data.adres;
-				formData.il = json.data.il;
-				formData.ilce = json.data.ilce;
+		spinner.show('vkn-lookup', {
+			container: '#vkn-container',
+			position: 'absolute',
+			showBackdrop: false,
+			backdropOpacity: 0.2,
+			adaptSize: true,
+			sizeFactor: 0.8
+		});
+
+		try {
+			const res = await fetch(`https://payment-api.arniva.tr/v1/mukellefler/${vknValue}`);
+			if (res.ok) {
+				const json = await res.json();
+				if (json && json.data && json.code === 0) {
+					formData.unvan = json.data.adi;
+					formData.adres = json.data.adres;
+					formData.il = json.data.il;
+					formData.ilce = json.data.ilce;
+				}
 			}
+		} catch (error) {
+			console.error('VKN lookup failed:', error);
+		} finally {
+			// Hide the spinner
+			setTimeout(() => {
+				spinner.hide('vkn-lookup');
+			}, 100);
 		}
 	}
 
@@ -125,8 +144,7 @@
 					<h4 class="mb-0 text-muted">Kimlik Bilgileri</h4>
 					<span class="text-muted">Devam etmek için lütfen kimlik bilgilerinizi giriniz.</span>
 				</div>
-
-				<div class="mb-3">
+				<div class="mb-3 position-relative" id="vkn-container">
 					<label for="vkn" class="form-label">Vkn/Tckn <code>*</code></label>
 					<input
 						bind:value={formData.vkn}

@@ -6,3 +6,9 @@
 4. import ruleset protect branch file
 5. enable email notifiction
 
+# Docker
+
+```sh
+docker-compose exec arniva-payment /bin/sh
+```
+
