@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@ruzgardogu/utils':
+        specifier: ^0.0.23
+        version: 0.0.23(svelte@5.38.1)
       bootstrap:
         specifier: ^5.3.7
         version: 5.3.7(@popperjs/core@2.11.8)
@@ -507,6 +510,11 @@ packages:
     resolution: {integrity: sha512-CvUo2ixeIQGtF6WvuB87XWqPQkoFAFqW+HUo/WzHwuHDvIwZCtjdWXoYCcr06iKGydiqTclC4jU/TNObC/xKZg==}
     cpu: [x64]
     os: [win32]
+
+  '@ruzgardogu/utils@0.0.23':
+    resolution: {integrity: sha512-7dDQC+B4TqXE3pzMhDZl6/tu1xooqImDMLqnJufPPSdLk4lJNj6t6xB8MUYGjV5udnV7NZnxBgnnqLC5G+/uvg==, tarball: https://npm.pkg.github.com/download/@ruzgardogu/utils/0.0.23/6d678e19c97d6baad12a248b66b9996c9ccc5baa}
+    peerDependencies:
+      svelte: ^5.0.0
 
   '@standard-schema/spec@1.0.0':
     resolution: {integrity: sha512-m2bOd0f2RT9k8QJx1JN85cZYyH1RqFBdlwtkSlf4tBDYLCiiZnv1fIIwacK6cqwXavOydf0NPToMQgpKq+dVlA==}
@@ -1565,6 +1573,10 @@ snapshots:
 
   '@rollup/rollup-win32-x64-msvc@4.46.2':
     optional: true
+
+  '@ruzgardogu/utils@0.0.23(svelte@5.38.1)':
+    dependencies:
+      svelte: 5.38.1
 
   '@standard-schema/spec@1.0.0': {}
 

@@ -2,6 +2,8 @@
 	import type { LayoutProps } from './$types';
 	import { page } from '$app/state'; // removed unused import
 	import { goto } from '$app/navigation';
+	import { toast } from '@ruzgardogu/utils';
+
 	let { data, children }: LayoutProps = $props();
 	// Wizard step info from page data
 	const wizard = $derived(page?.data?.custom || {});
@@ -15,7 +17,8 @@
 		if (step.no < wizard?.step) {
 			goto(step.url, { invalidateAll: true });
 		} else {
-			alert('Lütfen önce mevcut adımı tamamlayın');
+			// alert('Lütfen önce mevcut adımı tamamlayın');
+			toast.danger('Lütfen önce mevcut adımı tamamlayın');
 		}
 	}
 </script>
