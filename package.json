@@ -40,6 +40,7 @@
 	},
 	"dependencies": {
 		"@ruzgardogu/utils": "^0.0.23",
+		"@sveltejs/adapter-node": "^5.3.0",
 		"bootstrap": "^5.3.7"
 	}
 }
