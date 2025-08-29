@@ -13,10 +13,26 @@ export default defineConfig({
 			'@api': fileURLToPath(new URL('./src/lib/core/api', import.meta.url)),
 			'@helpers': fileURLToPath(new URL('./src/lib/core/helpers', import.meta.url)),
 			'@models': fileURLToPath(new URL('./src/lib/core/models', import.meta.url)),
-			'@views': fileURLToPath(new URL('./src/lib/core/views', import.meta.url))
+			'@views': fileURLToPath(new URL('./src/lib/core/views', import.meta.url)),
+			// Add alias for @ruzgardogu/utils CSS
+			'@ruzgardogu/utils/styles': fileURLToPath(new URL('./node_modules/@ruzgardogu/utils/dist/styles/app.css', import.meta.url))
 		}
 	},
 	optimizeDeps: {
-		include: ['@ruzgardogu/ui']
+		include: ['@ruzgardogu/utils']
+	},
+	ssr: {
+		noExternal: ['@ruzgardogu/utils']
+	},
+	build: {
+		rollupOptions: {
+			external: (id) => {
+				// Don't externalize CSS imports from @ruzgardogu/utils
+				if (id.includes('@ruzgardogu/utils') && id.includes('.css')) {
+					return false;
+				}
+				return false;
+			}
+		}
 	}
 });
