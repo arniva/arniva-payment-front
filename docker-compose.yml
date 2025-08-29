@@ -1,14 +1,28 @@
 version: '3.8'
 
 services:
-  arniva-payment:
+  # Development service
+  arniva-payment-dev:
     image: node:24-alpine
     working_dir: /app
     environment:
-      - NPM_TOKEN=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
+      - NPM_TOKEN=${NPM_TOKEN}
     volumes:
       - .:/app
       - ./.npmrc:/app/.npmrc
     ports:
       - "5173:5173"
     command: sh -c "corepack enable && corepack prepare pnpm@latest --activate && pnpm install && pnpm run dev --host 0.0.0.0"
+
+  # Production service (default)
+  arniva-payment:
+    build:
+      context: .
+      args:
+        NPM_TOKEN: ${NPM_TOKEN}
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - ORIGIN=${ORIGIN:-http://0.0.0.0:3000}
+    restart: unless-stopped

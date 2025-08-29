@@ -131,7 +131,8 @@
 		goto(url);
 	}
 
-	$inspect('selectedPackage', selectedPackage);
+	// Debug logging
+	console.log('selectedPackage', selectedPackage);
 	console.log('data', data);
 </script>
 
