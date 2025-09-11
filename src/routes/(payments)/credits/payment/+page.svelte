@@ -5,6 +5,7 @@
 	import IptalVeIadeKosullari from './IptalVeIadeKosullari.svelte';
 	import { calculateInstallmentAmount, formatTurkishCurrency } from './functions.svelte';
 	import InstallmentOptionsBox from './InstallmentOptionsBox.svelte';
+	import MonthYearSelect from './MonthYearSelect.svelte';
 	import YearSelect from './YearSelect.svelte';
 	import type { Package } from '../types';
 	import { toast } from '@ruzgardogu/utils';
@@ -177,9 +178,9 @@
 						/>
 					</div>
 
-					<div class="d-block d-lg-flex gap-3 align-items-center justify-content-between">
+					<div class="d-flex gap-3 align-items-center">
 						<div class="d-block d-lg-flex gap-3">
-							<div class="mb-3">
+							<!-- <div class="mb-3">
 								<label for="validUntilMonth" class="form-label">Ay <code>*</code></label>
 								<select
 									bind:value={formData.validUntilMonth}
@@ -216,6 +217,16 @@
 									{minYear}
 									bind:value={formData.validUntilYear}
 								/>
+							</div> -->
+
+							<div class="mb-3">
+								<MonthYearSelect
+									onChange={() => {
+										if (cvcInput) cvcInput.focus();
+									}}
+									bind:year={formData.validUntilYear}
+									bind:month={formData.validUntilMonth}
+								/>
 							</div>
 						</div>
 						<div>
@@ -233,6 +244,7 @@
 									oninput={handleCvcInput}
 									autocomplete="off"
 									required
+									style="width: 80px"
 								/>
 							</div>
 						</div>
