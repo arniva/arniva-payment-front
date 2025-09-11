@@ -89,6 +89,16 @@
 				</p>
 			</div>
 		</div>
+
+		<div>
+			<div class="row justify-content-center mb-4">
+				<hr />
+				<div class="col-lg-9">
+					<p class="mt-3 mb-1 text-muted">ARNİVA YAZILIM İTHALAT İHRACAT TİCARET A.Ş.</p>
+					<p class="mb-0">IBAN: <strong>TR45 0001 2009 2660 0010 2608 58</strong></p>
+				</div>
+			</div>
+		</div>
 	{:else}
 		<div class="alert bg-danger-subtle text-danger-emphasis p-4 text-center">
 			Verileri çekerken bir hata oluştu. Lütfen internet bağlantınızı kontrol edin. Eğer sorun

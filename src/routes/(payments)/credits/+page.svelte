@@ -142,7 +142,7 @@
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body p-4 lead">
-				Seçmiş olduğunuz paket yalnız E-Adisyon paketlerinde geçerlidir.
+				Tablonun altında yer alan kontör paketleri yalnız E-Adisyon için geçerlidir.
 			</div>
 			<div class="modal-footer border-0">
 				<button type="button" class="btn btn-danger" data-bs-dismiss="modal">Kapat</button>
