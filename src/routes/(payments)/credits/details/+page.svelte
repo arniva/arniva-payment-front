@@ -182,7 +182,7 @@
 					/>
 				</div>
 				<div class="mb-3 row">
-					<div class="col-12 col-md-4">
+					<div class="col-12 col-md-4 mb-2 mb-md-0">
 						<label for="il" class="form-label">İl <code>*</code></label>
 						<input
 							bind:value={formData.il}
