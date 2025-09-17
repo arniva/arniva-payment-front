@@ -58,10 +58,12 @@
 			type="text"
 			class="form-control border-0"
 			id="monthInput"
+			name="Ecom_Payment_Card_ExpDate_Month"
 		/>
 		<h6 class="mb-0 text-muted fw-light opacity-75">/</h6>
 		<input
 			id="yearInput"
+			name="Ecom_Payment_Card_ExpDate_Year"
 			bind:this={yearInput}
 			bind:value={yearSimple}
 			oninput={checkYearIsValid}

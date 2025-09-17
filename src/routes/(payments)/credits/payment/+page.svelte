@@ -15,9 +15,10 @@
 	let yearComponent: YearSelect;
 	let cvcInput: HTMLInputElement | null;
 
-	let pageData = $state(data?.urlData || null);
+	let pageData = $state(data?.urlData || form?.urlData || null);
 	const encodedPageData = $derived(btoa(encodeURIComponent(JSON.stringify(pageData))));
-
+	$inspect('pageData', pageData);
+	$inspect('form', form);
 	let selectedPackage = $derived(
 		pageData?.selectedPackageId
 			? data.packages.find((pkg: Package) => pkg.id === pageData.selectedPackageId)
@@ -127,60 +128,82 @@
 		{errorMessage}
 	</div>
 {/if} -->
+{#if selectedPackage}
+	{#if form?.success === false && form?.message}
+		<div class="row justify-content-center">
+			<div class="col-12 col-md-9">
+				<div class="alert alert-danger mb-4" role="alert">
+					{form.message}
+				</div>
+			</div>
+		</div>
+	{/if}
+	<div class="row"></div>
 
-<div class="row justify-content-center">
-	<div class="col-12 col-md-9">
-		<form action="/credits/payment?/pay" method="POST">
-			<input type="hidden" name="installment" value={formData.installment} />
-			<input type="hidden" name="validUntilYear" value={formData.validUntilYear} />
-			<input type="hidden" name="encoded" value={encodedPageData} />
-			<div class="row">
-				<!-- This will be col-8 on desktop, but appear second on mobile -->
-				<div class="col-12 col-md-8 order-1 order-md-2 pe-4 mb-4 mb-md-0">
-					<div class="mb-4">
-						<h4 class="mb-0 text-muted">Kart Bilgileri</h4>
-						<span class="text-muted">Devam etmek için lütfen kart bilgilerinizi giriniz.</span>
-					</div>
+	<div class="row justify-content-center">
+		<div class="col-12 col-md-9">
+			<form method="post" action={data.paymentData.gatewayUrl} class="space-y-6">
+				<!-- Hidden payment parameters -->
+				<input type="hidden" name="Desc1" value={encodedPageData} />
+				<input type="hidden" name="clientid" value={data.paymentData.clientid} />
+				<input type="hidden" name="storetype" value={data.paymentData.storetype} />
+				<input type="hidden" name="hash" value={data.paymentData.hash} />
+				<input type="hidden" name="islemtipi" value={data.paymentData.islemtipi} />
+				<input type="hidden" name="amount" value={data.paymentData.amount} />
+				<input type="hidden" name="currency" value={data.paymentData.currency} />
+				<input type="hidden" name="oid" value={data.paymentData.oid} />
+				<input type="hidden" name="okUrl" value={data.paymentData.okUrl} />
+				<input type="hidden" name="failUrl" value={data.paymentData.failUrl} />
+				<input type="hidden" name="lang" value={data.paymentData.lang} />
+				<input type="hidden" name="rnd" value={data.paymentData.rnd} />
+				<input type="hidden" name="firmaadi" value={formData.name} />
+				<div class="row">
+					<!-- This will be col-8 on desktop, but appear second on mobile -->
+					<div class="col-12 col-md-8 order-1 order-md-2 pe-4 mb-4 mb-md-0">
+						<div class="mb-4">
+							<h4 class="mb-0 text-muted">Kart Bilgileri</h4>
+							<span class="text-muted">Devam etmek için lütfen kart bilgilerinizi giriniz.</span>
+						</div>
 
-					<CreditCard bind:formData />
+						<CreditCard bind:formData />
 
-					<div class="mb-3">
-						<label for="name" class="form-label">Kart Sahibi <code>*</code></label>
-						<input
-							bind:value={formData.name}
-							name="name"
-							type="text"
-							class="form-control"
-							id="name"
-							placeholder="Kart Sahibi"
-							required
-							autocomplete="cc-name"
-							oninput={(e) => {
-								const input = e.target as HTMLInputElement;
-								input.value = input.value.replace(/[^a-zA-ZğüşöçıİĞÜŞÖÇ\s]/g, '');
-								formData.name = input.value;
-							}}
-						/>
-					</div>
-					<div class="mb-3">
-						<label for="vkn" class="form-label">Kart Numarası <code>*</code></label>
-						<input
-							bind:value={formData.no}
-							name="no"
-							type="text"
-							class="form-control"
-							id="no"
-							placeholder="XXXX XXXX XXXX XXXX"
-							maxlength="19"
-							oninput={(e) => handleCardInput(e as unknown as InputEvent)}
-							required
-							autocomplete="cc-number"
-						/>
-					</div>
+						<div class="mb-3">
+							<label for="name" class="form-label">Kart Sahibi <code>*</code></label>
+							<input
+								bind:value={formData.name}
+								name="name"
+								type="text"
+								class="form-control"
+								id="name"
+								placeholder="Kart Sahibi"
+								required
+								autocomplete="cc-name"
+								oninput={(e) => {
+									const input = e.target as HTMLInputElement;
+									input.value = input.value.replace(/[^a-zA-ZğüşöçıİĞÜŞÖÇ\s]/g, '');
+									formData.name = input.value;
+								}}
+							/>
+						</div>
+						<div class="mb-3">
+							<label for="vkn" class="form-label">Kart Numarası <code>*</code></label>
+							<input
+								bind:value={formData.no}
+								name="pan"
+								type="text"
+								class="form-control"
+								id="no"
+								placeholder="XXXX XXXX XXXX XXXX"
+								maxlength="19"
+								oninput={(e) => handleCardInput(e as unknown as InputEvent)}
+								required
+								autocomplete="cc-number"
+							/>
+						</div>
 
-					<div class="d-flex gap-3 align-items-center">
-						<div class="d-block d-lg-flex gap-3">
-							<!-- <div class="mb-3">
+						<div class="d-flex gap-3 align-items-center">
+							<div class="d-block d-lg-flex gap-3">
+								<!-- <div class="mb-3">
 								<label for="validUntilMonth" class="form-label">Ay <code>*</code></label>
 								<select
 									bind:value={formData.validUntilMonth}
@@ -219,38 +242,38 @@
 								/>
 							</div> -->
 
-							<div class="mb-3">
-								<MonthYearSelect
-									onChange={() => {
-										if (cvcInput) cvcInput.focus();
-									}}
-									bind:year={formData.validUntilYear}
-									bind:month={formData.validUntilMonth}
-								/>
+								<div class="mb-3">
+									<MonthYearSelect
+										onChange={() => {
+											if (cvcInput) cvcInput.focus();
+										}}
+										bind:year={formData.validUntilYear}
+										bind:month={formData.validUntilMonth}
+									/>
+								</div>
+							</div>
+							<div>
+								<div class="mb-3">
+									<label for="cvc" class="form-label">CVC <code>*</code></label>
+									<input
+										bind:this={cvcInput}
+										bind:value={formData.cvc}
+										name="cv2"
+										type="text"
+										class="form-control"
+										id="cvc"
+										placeholder="123"
+										maxlength="3"
+										oninput={handleCvcInput}
+										autocomplete="off"
+										required
+										style="width: 80px"
+									/>
+								</div>
 							</div>
 						</div>
-						<div>
-							<div class="mb-3">
-								<label for="cvc" class="form-label">CVC <code>*</code></label>
-								<input
-									bind:this={cvcInput}
-									bind:value={formData.cvc}
-									name="cvc"
-									type="text"
-									class="form-control"
-									id="cvc"
-									placeholder="123"
-									maxlength="3"
-									oninput={handleCvcInput}
-									autocomplete="off"
-									required
-									style="width: 80px"
-								/>
-							</div>
-						</div>
-					</div>
-
-					{#if cardValid}
+						<!-- TODO: Taksit Seçeneklerine sonra bakılacak -->
+						<!-- {#if cardValid}
 						{@const selectedInstallment = installmentOptions.find(
 							(option) => option.value === formData.installment
 						)}
@@ -260,12 +283,11 @@
 							{selectedPackage}
 							{formData}
 						/>
-					{/if}
-				</div>
+					{/if} -->
+					</div>
 
-				<!-- This will be col-4 on desktop, but appear first on mobile -->
-				<div class="col-12 col-md-4 order-1 order-md-2">
-					{#if selectedPackage}
+					<!-- This will be col-4 on desktop, but appear first on mobile -->
+					<div class="col-12 col-md-4 order-1 order-md-2">
 						<div class="card card-body p-4 border-0 shadow sticky-top top-0">
 							<h5 class="mb-2 text-primary">Ödenecek Tutar</h5>
 							{#if formData.installment === 1}
@@ -344,14 +366,13 @@
 								<div>Fiyatlara KDV dahildir.</div>
 							</div>
 						</div>
-					{/if}
+					</div>
 				</div>
-			</div>
-		</form>
+			</form>
+		</div>
 	</div>
-</div>
 
-<!-- <div
+	<!-- <div
 	class="modal fade"
 	id="installmentModal"
 	tabindex="-1"
@@ -419,39 +440,57 @@
 	</div>
 </div> -->
 
-<div
-	class="offcanvas offcanvas-start"
-	tabindex="-1"
-	id="mesafeliSatisSozlesmesi"
-	aria-labelledby="mesafeliSatisSozlesmesiLabel"
->
-	<div class="offcanvas-header">
-		<h5 class="offcanvas-title" id="mesafeliSatisSozlesmesiLabel">Mesafeli Satış Sözleşmesi</h5>
-		<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+	<div
+		class="offcanvas offcanvas-start"
+		tabindex="-1"
+		id="mesafeliSatisSozlesmesi"
+		aria-labelledby="mesafeliSatisSozlesmesiLabel"
+	>
+		<div class="offcanvas-header">
+			<h5 class="offcanvas-title" id="mesafeliSatisSozlesmesiLabel">Mesafeli Satış Sözleşmesi</h5>
+			<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"
+			></button>
+		</div>
+		<div class="offcanvas-body p-3 p-md-4">
+			{#if formData && selectedPackage}
+				<MesafeliSatisSozlesmesi {pageData} {selectedPackage} />
+			{/if}
+		</div>
 	</div>
-	<div class="offcanvas-body p-3 p-md-4">
-		{#if formData && selectedPackage}
-			<MesafeliSatisSozlesmesi {pageData} {selectedPackage} />
-		{/if}
-	</div>
-</div>
 
-<div
-	class="offcanvas offcanvas-start"
-	tabindex="-1"
-	id="iptalVeIadeKosullari"
-	aria-labelledby="iptalVeIadeKosullariLabel"
->
-	<div class="offcanvas-header">
-		<h5 class="offcanvas-title" id="iptalVeIadeKosullariLabel">İptal ve İade Koşulları</h5>
-		<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+	<div
+		class="offcanvas offcanvas-start"
+		tabindex="-1"
+		id="iptalVeIadeKosullari"
+		aria-labelledby="iptalVeIadeKosullariLabel"
+	>
+		<div class="offcanvas-header">
+			<h5 class="offcanvas-title" id="iptalVeIadeKosullariLabel">İptal ve İade Koşulları</h5>
+			<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"
+			></button>
+		</div>
+		<div class="offcanvas-body p-3 p-md-4">
+			{#if formData && selectedPackage}
+				<IptalVeIadeKosullari />
+			{/if}
+		</div>
 	</div>
-	<div class="offcanvas-body p-3 p-md-4">
-		{#if formData && selectedPackage}
-			<IptalVeIadeKosullari />
-		{/if}
+{:else}
+	<div class="row justify-content-center">
+		<div class="col-12 col-md-9">
+			<div
+				class="alert alert-danger mb-4 d-flex align-items-center justify-content-between"
+				role="alert"
+			>
+				Geçersiz paket seçimi. Lütfen tekrar deneyiniz.
+				<a href="/" class="btn">
+					<i class="bi bi-house-door-fill me-2"></i>
+					Yeniden Dene</a
+				>
+			</div>
+		</div>
 	</div>
-</div>
+{/if}
 
 <style>
 	#mesafeliSatisSozlesmesi,
