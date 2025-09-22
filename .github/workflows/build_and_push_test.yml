@@ -10,6 +10,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      - name: inject env file
+        run: echo ${{secrets.ENV_FILE}} | base64 --decode > .env
       - name: build image
         run: docker build -t ${{github.repository}}:test-latest .
       - name: push image
