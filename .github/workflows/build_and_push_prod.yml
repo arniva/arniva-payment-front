@@ -30,7 +30,8 @@ jobs:
           TAG="release-${TAG_DATE}"
           git tag -a "$TAG" -m "Automated tag for main at $TAG_DATE"
           git push origin "$TAG"
-
+      - name: inject env file
+        run: echo ${{secrets.ENV_FILE}} | base64 --decode > .env
       - name: build image
         env:
           TAG_DATE: ${{ env.TAG_DATE }}
