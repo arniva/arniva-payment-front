@@ -75,8 +75,7 @@ export const load = (async ({ url }) => {
     // Create hash for authentication
     // plaintext = clientid + oid + amount + okurl + failurl + transactiontype + instalment + rnd + storekey
     const plaintext = clientid + oid + amount + okUrl + failUrl + islemtipi + "" + rnd + storekey;
-    const hash = crypto.createHash('sha1').update(plaintext).digest('base64');
-
+    const hash = crypto.createHash('sha256').update(plaintext).digest('base64');
 
     return {
         urlData,
