@@ -28,27 +28,50 @@ function decodeFormData(d: string | null) {
   return null;
 }
 
-export const load = (async ({ url }) => {    
+export const load = (async ({ url, parent }) => {
   const urlRawData = url.searchParams.get('data');
   const urlData = decodeFormData(urlRawData);
 
+  const { packages } = await parent();
+
+    if(!packages || !urlData || !urlData.selectedPackageId) {
+        redirect(302, '/credits');
+    }
+
+    let selectedPackage = packages.find((pkg: Package) => pkg.id === urlData.selectedPackageId);
+    if(!selectedPackage) {
+        redirect(302, '/credits');
+    }
+
+    console.log("selectedPackage:", selectedPackage);
+
+console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+console.log("testing:", packages);
+console.log("URL Raw Data:", urlRawData);
+console.log("Decoded URL Data:", urlData);
+console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
     // Generate unique order ID
     const oid = Date.now().toString();
     
     // Payment parameters
-    const amount = "1.00"; // 1 Turkish Lira
+    const amount = selectedPackage.total.toFixed(2); // 1 Turkish Lira
     const currency = NESTPAY_CURRENCY; // 949 for TL
     
     // Determine environment variables based on dev/prod and IS_TESTING
     let clientid: string;
     let storekey: string;
     let gatewayUrl: string;
-    
+    let okUrl: string;
+    let failUrl: string;
+
+
     if (dev) {
         // Production: always use live variables
         clientid = TEST_NESTPAY_CLIENT_ID;
         storekey = TEST_NESTPAY_STORE_KEY;
         gatewayUrl = TEST_NESTPAY_GATEWAY_URL;
+        okUrl = `${url.origin}/paymentsuccess`;
+        failUrl = `${url.origin}/credits/payment?status=failed`;
     } else {
         // Development: use test if IS_TESTING is true, else live
         if (IS_TESTING === 'true') {
@@ -60,6 +83,8 @@ export const load = (async ({ url }) => {
             storekey = LIVE_NESTPAY_STORE_KEY;
             gatewayUrl = LIVE_NESTPAY_GATEWAY_URL;
         }
+        okUrl = 'https://odeme.arniva.tr/paymentsuccess';
+        failUrl = 'https://odeme.arniva.tr/credits/payment?status=failed';
     }
     
     const storetype = NESTPAY_STORE_TYPE; // 3d_pay
@@ -68,11 +93,12 @@ export const load = (async ({ url }) => {
     const rnd = Math.random().toString(36).substring(2, 15);
     
     // URLs for success and failure redirects
-    const origin = url.origin;
-    const okUrl = `${origin}/paymentsuccess`;
-    const failUrl = `${origin}/credits/payment?status=failed`;
+    // const origin = url.origin;
+    // const okUrl = dev ? `${origin}/paymentsuccess` : 'https://odeme.arniva.tr/paymentsuccess';
+    // const failUrl = dev ? `${origin}/credits/payment?status=failed` : 'https://odeme.arniva.tr/credits/payment?status=failed';
     
     // Create hash for authentication
+    // TODO: Henüz installment eklenmedi, o yüzden boş geçiliyor.
     // plaintext = clientid + oid + amount + okurl + failurl + transactiontype + instalment + rnd + storekey
     const plaintext = clientid + oid + amount + okUrl + failUrl + islemtipi + "" + rnd + storekey;
     const hash = crypto.createHash('sha256').update(plaintext).digest('base64');
