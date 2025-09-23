@@ -46,20 +46,23 @@
 	</div>
 
 	<!-- Payment Form -->
-	<form method="post" action={data.paymentData.gatewayUrl} class="space-y-6">
+	<form method="post" action="/hash-handler?seamless=true" class="space-y-6">
 		<!-- Hidden payment parameters -->
 		<input type="hidden" name="Desc1" value={encodedPageData} />
 		<input type="hidden" name="clientid" value={data.paymentData.clientid} />
 		<input type="hidden" name="storetype" value={data.paymentData.storetype} />
-		<input type="hidden" name="hash" value={data.paymentData.hash} />
-		<input type="hidden" name="islemtipi" value={data.paymentData.islemtipi} />
+		<input type="hidden" name="hashAlgorithm" value={data.paymentData.hashAlgorithm} />
+		<input type="hidden" name="TranType" value={data.paymentData.islemtipi} />
 		<input type="hidden" name="amount" value={data.paymentData.amount} />
 		<input type="hidden" name="currency" value={data.paymentData.currency} />
 		<input type="hidden" name="oid" value={data.paymentData.oid} />
-		<input type="hidden" name="okUrl" value={data.paymentData.okUrl} />
+		<input type="hidden" name="okurl" value={data.paymentData.okUrl} />
 		<input type="hidden" name="failUrl" value={data.paymentData.failUrl} />
+		<input type="hidden" name="Instalment" value={data.paymentData.Instalment} />
 		<input type="hidden" name="lang" value={data.paymentData.lang} />
 		<input type="hidden" name="rnd" value={data.paymentData.rnd} />
+		<input type="hidden" name="callbackUrl" value={data.paymentData.okUrl} />
+		<input type="hidden" name="BillToName" value="Test User" />
 
 		<!-- Card Information -->
 		<div class="bg-white p-6 rounded-lg border">
@@ -75,7 +78,7 @@
 						id="pan"
 						name="pan"
 						bind:value={cardNumber}
-						placeholder="1234 5678 9012 3456"
+						placeholder="1234567890123456"
 						maxlength="20"
 						class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 						required

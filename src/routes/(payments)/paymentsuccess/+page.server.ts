@@ -1,5 +1,13 @@
 import { decode } from 'punycode';
-import type { PageServerLoad } from './$types';
+import type { PageServerLoad, Actions } from './$types';
+import type { Package } from '../credits/types';
+import { verifyNestpayHashV3 } from '$lib/netspay-hash';
+import { 
+    TEST_NESTPAY_STORE_KEY,
+    LIVE_NESTPAY_STORE_KEY,
+    IS_TESTING
+} from '$env/static/private';
+import { dev } from '$app/environment';
 
 export const load = (async () => {
     return {
@@ -15,6 +23,42 @@ export const actions: Actions = {
     default: async ({ request, fetch }) => {
         const formData = await request.formData();
         console.log('Payment Success Form Data:', Object.fromEntries(formData.entries()));
+
+        // Determine which store key to use based on environment
+        let storeKey: string;
+        if (dev) {
+            storeKey = TEST_NESTPAY_STORE_KEY;
+        } else {
+            storeKey = IS_TESTING === 'true' ? TEST_NESTPAY_STORE_KEY : LIVE_NESTPAY_STORE_KEY;
+        }
+
+        // Convert form data to parameters object for hash verification
+        const responseParameters: Record<string, string> = {};
+        formData.forEach((value, key) => {
+            responseParameters[key] = value.toString();
+        });
+
+        // Verify hash if present
+        const receivedHash = formData.get('HASH')?.toString() || formData.get('hash')?.toString();
+        let isHashValid = false;
+        
+        if (receivedHash) {
+            isHashValid = verifyNestpayHashV3(responseParameters, storeKey, receivedHash);
+            console.log('Hash verification result:', isHashValid);
+            
+            if (!isHashValid) {
+                console.warn('Hash verification failed! This response may not be from Netspay.');
+                return {
+                    result: {
+                        success: false,
+                        error: 'Hash verification failed',
+                        data: responseParameters
+                    }
+                };
+            }
+        } else {
+            console.warn('No hash found in response - unable to verify authenticity');
+        }
 
         let Desc1 = formData.get('Desc1');
         let decoded = null;
@@ -78,9 +122,9 @@ export const actions: Actions = {
             }
         }
 
-        let formResult = {};
+        let formResult: Record<string, string> = {};
         formData.forEach((value, key) => {
-            formResult[key] = value;
+            formResult[key] = value.toString();
         });
         console.log('Parsed Form Data:', formResult);
 
@@ -89,7 +133,8 @@ export const actions: Actions = {
             data: formResult,
             decoded: decoded,
             saveResult,
-            packageInfo
+            packageInfo,
+            hashValid: isHashValid
         }
 
         return { result };

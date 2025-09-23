@@ -1,7 +1,6 @@
-import type { PageServerLoad } from './$types';
+import type { PageServerLoad, Actions } from './$types';
 import { redirect } from '@sveltejs/kit';
 import type { Package } from '../types';
-import crypto from 'crypto';
 import { dev } from '$app/environment';
 import { 
     TEST_NESTPAY_CLIENT_ID,
@@ -29,32 +28,37 @@ function decodeFormData(d: string | null) {
 }
 
 export const load = (async ({ url, parent }) => {
-  const urlRawData = url.searchParams.get('data');
-  const urlData = decodeFormData(urlRawData);
+    // TODO: Fail olduğundaki senaryoya da bakmak lazım. Aşağıda form actions ile bağlantılı.
+    // Şu anda credits sayfasına redirect yapıyor. çünkü amount bilgisi için package bilgisine ihtiyaç var.
+    const urlRawData = url.searchParams.get('data');
+    const urlData = decodeFormData(urlRawData);
+    const status = url.searchParams.get('status');
 
-  const { packages } = await parent();
+    const { packages } = await parent();
 
-    if(!packages || !urlData || !urlData.selectedPackageId) {
-        redirect(302, '/credits');
+    // if(!packages || !urlData || !urlData.selectedPackageId) {
+    //   redirect(302, '/credits');
+    // }
+    
+    let selectedPackage = packages.find((pkg: Package) => pkg.id === urlData?.selectedPackageId) || null;
+    // if(!selectedPackage) {
+    //     redirect(302, '/credits');
+    // }
+    
+    // Check if this is a failed payment return
+    let paymentError = null;
+    if (status === 'failed') {
+        paymentError = {
+            message: 'Ödeme işlemi başarısız oldu. Lütfen tekrar deneyin.',
+            show: true
+        };
     }
-
-    let selectedPackage = packages.find((pkg: Package) => pkg.id === urlData.selectedPackageId);
-    if(!selectedPackage) {
-        redirect(302, '/credits');
-    }
-
-    console.log("selectedPackage:", selectedPackage);
-
-console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-console.log("testing:", packages);
-console.log("URL Raw Data:", urlRawData);
-console.log("Decoded URL Data:", urlData);
-console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-    // Generate unique order ID
+    
+    // console.log("selectedPackage:", selectedPackage);
     const oid = Date.now().toString();
     
     // Payment parameters
-    const amount = selectedPackage.total.toFixed(2); // 1 Turkish Lira
+    const amount = selectedPackage?.total?.toFixed(2); // 1 Turkish Lira
     const currency = NESTPAY_CURRENCY; // 949 for TL
     
     // Determine environment variables based on dev/prod and IS_TESTING
@@ -97,19 +101,14 @@ console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
     // const okUrl = dev ? `${origin}/paymentsuccess` : 'https://odeme.arniva.tr/paymentsuccess';
     // const failUrl = dev ? `${origin}/credits/payment?status=failed` : 'https://odeme.arniva.tr/credits/payment?status=failed';
     
-    // Create hash for authentication
-    // TODO: Henüz installment eklenmedi, o yüzden boş geçiliyor.
-    // plaintext = clientid + oid + amount + okurl + failurl + transactiontype + instalment + rnd + storekey
-    const plaintext = clientid + oid + amount + okUrl + failUrl + islemtipi + "" + rnd + storekey;
-    const hash = crypto.createHash('sha1').update(plaintext).digest('base64');
-
-
+    // Hash will be calculated by the hash handler with all form parameters including card details
+    
     return {
         urlData,
         paymentData: {
             clientid,
             storetype,
-            hash,
+            hashAlgorithm: 'ver3',
             islemtipi,
             amount,
             currency,
@@ -118,13 +117,15 @@ console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
             failUrl,
             lang,
             rnd,
+            Instalment: '', // Required for Hash V3
             gatewayUrl: gatewayUrl
         },
         custom: {
             title: 'Ödeme',
             step: 3,
             urlRawData
-        }
+        },
+        paymentError
     };
 }) satisfies PageServerLoad;
 
@@ -132,33 +133,33 @@ console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
 
 export const actions: Actions = {
     default: async ({ request, url }) => {
-        console.log("________________________Payment Action Triggered");
         const formData = await request.formData();
-        console.log('Payment Form Data:', Object.fromEntries(formData.entries()));
-
         const status = url.searchParams.get('status');
-        console.log("Payment Status:", status);
-        console.log("________________________");
+        
         if(status === 'failed') {
-
-          let Desc1 = formData.get('Desc1');
-          if(Desc1) {
-              const urlData = decodeFormData(Desc1);
-              console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-              console.log("Decoded Desc1 on Failure:", urlData);
-              console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-              return {
-                  success: false,
-                  urlData,
-                  message: 'Ödeme işlemi başarısız oldu. Lütfen tekrar deneyin.'
-              };
-          }
-          return {
-              success: false,
-              message: 'Ödeme işlemi başarısız oldu. Lütfen tekrar deneyin.'
-          };
-      }
-      return { success: true };
+            console.log('Payment failed, form data:', Object.fromEntries(formData.entries()));
+            
+            let Desc1 = formData.get('Desc1');
+            let urlData = null;
+            
+            if(Desc1) {
+                redirect(302, `/credits/payment?data=${encodeURIComponent(Desc1 as string)}&status=failed`);
+                // urlData = decodeFormData(Desc1.toString());
+                // console.log("Payment failed, decoded Desc1:", urlData);
+            }
+            
+            // Return error state instead of redirecting
+            return {
+                success: false,
+                urlData,
+                error: true,
+                message: 'Ödeme işlemi başarısız oldu. Lütfen tekrar deneyin.',
+                formData: Object.fromEntries(formData.entries())
+            };
+        }
+        
+        // For successful payments, redirect to success page
+        return { success: true };
     }
 };
 
