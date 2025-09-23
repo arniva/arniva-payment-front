@@ -19,6 +19,7 @@
 	const encodedPageData = $derived(btoa(encodeURIComponent(JSON.stringify(pageData))));
 	$inspect('pageData', pageData);
 	$inspect('form', form);
+
 	let selectedPackage = $derived(
 		pageData?.selectedPackageId
 			? data.packages.find((pkg: Package) => pkg.id === pageData.selectedPackageId)
@@ -118,6 +119,29 @@
 			pageData = form.data.encodedPageData;
 		}
 	});
+
+	// $effect(() => {
+	// 	if (selectedPackage && data && data.paymentData) {
+	// 		console.log('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$');
+	// 		console.log('Selected Package:', selectedPackage);
+	// 		console.log('Data Packages Payment Data:', data.paymentData);
+	// 		data.paymentData.amount = selectedPackage.total.toFixed(2);
+	// 		console.log('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$');
+	// 	}
+	// });
+
+	function getAllFormData(event: Event) {
+		// console.log all form data before submit
+		let form = event.target as HTMLFormElement;
+		let formData = new FormData(form);
+		for (let [key, value] of formData.entries()) {
+			console.log(`${key}: ${value}`);
+		}
+		event.preventDefault();
+		return true;
+	}
+
+	$inspect('data', data);
 </script>
 
 <!-- {#if errorMessage}
@@ -142,7 +166,12 @@
 
 	<div class="row justify-content-center">
 		<div class="col-12 col-md-9">
-			<form method="post" action={data.paymentData.gatewayUrl} class="space-y-6">
+			<form
+				method="post"
+				action={data.paymentData.gatewayUrl}
+				class="space-y-6"
+				onsubmit={getAllFormData}
+			>
 				<!-- Hidden payment parameters -->
 				<input type="hidden" name="Desc1" value={encodedPageData} />
 				<input type="hidden" name="clientid" value={data.paymentData.clientid} />
