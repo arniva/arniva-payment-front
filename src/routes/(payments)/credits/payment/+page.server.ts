@@ -114,6 +114,7 @@ export const load = (async ({ url, parent }) => {
             oid,
             okUrl,
             failUrl,
+            callbackUrl: 'https://payment-api.arniva.tr/v1/callback',
             lang,
             rnd,
             Instalment: '', // Required for Hash V3
