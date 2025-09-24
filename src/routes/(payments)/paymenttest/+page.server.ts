@@ -1,5 +1,4 @@
 import type { PageServerLoad } from './$types';
-import crypto from 'crypto';
 import { 
     TEST_NESTPAY_CLIENT_ID,
     TEST_NESTPAY_STORE_KEY,
@@ -28,16 +27,13 @@ export const load = (async ({ url }) => {
     const okUrl = `${origin}/paymentsuccess`;
     const failUrl = `${origin}/paymenttest?status=failed`;
     
-    // Create hash for authentication
-    // plaintext = clientid + oid + amount + okurl + failurl + transactiontype + instalment + rnd + storekey
-    const plaintext = clientid + oid + amount + okUrl + failUrl + islemtipi + "" + rnd + TEST_NESTPAY_STORE_KEY;
-    const hash = crypto.createHash('sha1').update(plaintext).digest('base64');
+    // Hash will be calculated by the hash handler with all form parameters including card details
     
     return {
         paymentData: {
             clientid,
             storetype,
-            hash,
+            hashAlgorithm: 'ver3',
             islemtipi,
             amount,
             currency,
@@ -46,6 +42,7 @@ export const load = (async ({ url }) => {
             failUrl,
             lang,
             rnd,
+            Instalment: '', // Required for Hash V3
             gatewayUrl: TEST_NESTPAY_GATEWAY_URL
         },
         testCards: [
