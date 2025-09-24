@@ -139,12 +139,47 @@
 		// }
 	});
 
-	function getAllFormData(event: Event) {
+	async function getAllFormData(event: Event) {
 		// console.log all form data before submit
 		event.preventDefault();
+
+		// const postBody = {
+		// 	vtc: pageData.vkn,
+		// 	unvan: pageData.unvan,
+		// 	aciklama: pageData.description,
+		// 	paket_id: pageData.selectedPackageId,
+		// 	taksit: 1,
+		// 	kart4: Number(String(formData.no).slice(-4)),
+		// 	kartsahibi: formData.name,
+		// 	adres: pageData.adres,
+		// 	il: pageData.il,
+		// 	ilce: pageData.ilce
+		// };
+
+		// const postRes = await fetch('https://payment-api.arniva.tr/v1/hareketler', {
+		// 	method: 'POST',
+		// 	headers: {
+		// 		'Content-Type': 'application/json'
+		// 	},
+		// 	body: JSON.stringify(postBody)
+		// });
+
+		// console.log('Post response status:', postRes);
+
+		// if (postRes.ok) {
+		// 	const result = await postRes.json();
+		// 	console.log('Post response data:', result);
+
+		// 	if (result && result.code === 0 && result.data?.id) {
+		// 		let oid = result.data.id;
+		// 	}
+		// }
+
+		// return;
+
 		let form = event.target as HTMLFormElement;
-		let formData = new FormData(form);
-		for (let [key, value] of formData.entries()) {
+		let netspayFormData = new FormData(form);
+		for (let [key, value] of netspayFormData.entries()) {
 			console.log(`${key}: ${value}`);
 		}
 		setTimeout(() => {
@@ -189,7 +224,7 @@
 				<input type="hidden" name="Instalment" value={data.paymentData.Instalment} />
 				<input type="hidden" name="lang" value={data.paymentData.lang} />
 				<input type="hidden" name="rnd" value={data.paymentData.rnd} />
-				<input type="hidden" name="callbackUrl" value={data.paymentData.okUrl} />
+				<input type="hidden" name="callbackUrl" value={data.paymentData.callbackUrl} />
 				<!-- Card number without spaces for Netspay -->
 				<input type="hidden" name="pan" value={formData.no.replace(/\s/g, '')} />
 				<input type="hidden" name="BillToName" value={formData.name} />
@@ -227,7 +262,7 @@
 							/>
 						</div>
 						<div class="mb-3">
-							<label for="vkn" class="form-label">Kart Numarası <code>*</code></label>
+							<label for="no" class="form-label">Kart Numarası <code>*</code></label>
 							<input
 								bind:value={formData.no}
 								type="text"
