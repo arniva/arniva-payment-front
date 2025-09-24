@@ -93,65 +93,67 @@
 	let errorMessage = $state('');
 	let lastShownMessage = $state('');
 
-	$effect(() => {
-		if (form && form.message && form.message !== lastShownMessage) {
-			errorMessage = form.message;
-			if (errorMessage) {
-				toast.danger(errorMessage);
-				lastShownMessage = errorMessage;
-				errorMessage = '';
-			}
-		}
-		if (form && form.data?.cardBody) {
-			const cardBody = form.data.cardBody;
-			formData = {
-				name: typeof cardBody.name === 'string' ? cardBody.name : '',
-				no: typeof cardBody.no === 'string' ? cardBody.no : '',
-				cvc: typeof cardBody.cvc === 'string' ? cardBody.cvc : '',
-				validUntilMonth:
-					typeof cardBody.validUntilMonth === 'string' ? cardBody.validUntilMonth : '',
-				validUntilYear: typeof cardBody.validUntilYear === 'string' ? cardBody.validUntilYear : '',
-				installment: typeof cardBody.installment === 'string' ? Number(cardBody.installment) : 1,
-				price: typeof cardBody.price === 'string' ? Number(cardBody.price) : 0
-			};
-		}
-		if (form && form.data?.encodedPageData) {
-			pageData = form.data.encodedPageData;
-		}
-	});
+	if (data && data.paymentError && data.paymentError.message) {
+		errorMessage = data.paymentError.message;
+		toast.danger(errorMessage);
+	}
 
-	// $effect(() => {
-	// 	if (selectedPackage && data && data.paymentData) {
-	// 		console.log('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$');
-	// 		console.log('Selected Package:', selectedPackage);
-	// 		console.log('Data Packages Payment Data:', data.paymentData);
-	// 		data.paymentData.amount = selectedPackage.total.toFixed(2);
-	// 		console.log('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$');
-	// 	}
-	// });
+	$effect(() => {
+		// // Handle form action errors
+		// if (form && form.message && form.message !== lastShownMessage) {
+		// 	errorMessage = form.message;
+		// 	if (errorMessage) {
+		// 		toast.danger(errorMessage);
+		// 		lastShownMessage = errorMessage;
+		// 		errorMessage = '';
+		// 	}
+		// }
+		// // Handle payment errors from load function (failed payment redirects)
+		// if (
+		// 	data.paymentError &&
+		// 	data.paymentError.show &&
+		// 	data.paymentError.message !== lastShownMessage
+		// ) {
+		// 	errorMessage = data.paymentError.message;
+		// 	if (errorMessage) {
+		// 		toast.danger(errorMessage);
+		// 		lastShownMessage = errorMessage;
+		// 		errorMessage = '';
+		// 	}
+		// }
+		// if (form && form.data?.cardBody) {
+		// 	const cardBody = form.data.cardBody;
+		// 	formData = {
+		// 		name: typeof cardBody.name === 'string' ? cardBody.name : '',
+		// 		no: typeof cardBody.no === 'string' ? cardBody.no : '',
+		// 		cvc: typeof cardBody.cvc === 'string' ? cardBody.cvc : '',
+		// 		validUntilMonth:
+		// 			typeof cardBody.validUntilMonth === 'string' ? cardBody.validUntilMonth : '',
+		// 		validUntilYear: typeof cardBody.validUntilYear === 'string' ? cardBody.validUntilYear : '',
+		// 		installment: typeof cardBody.installment === 'string' ? Number(cardBody.installment) : 1,
+		// 		price: typeof cardBody.price === 'string' ? Number(cardBody.price) : 0
+		// 	};
+		// }
+		// if (form && form.data?.encodedPageData) {
+		// 	pageData = form.data.encodedPageData;
+		// }
+	});
 
 	function getAllFormData(event: Event) {
 		// console.log all form data before submit
+		event.preventDefault();
 		let form = event.target as HTMLFormElement;
 		let formData = new FormData(form);
 		for (let [key, value] of formData.entries()) {
 			console.log(`${key}: ${value}`);
 		}
-		event.preventDefault();
+		setTimeout(() => {
+			form.submit();
+		}, 100);
 		return true;
 	}
-
-	$inspect('data', data);
 </script>
 
-<!-- {#if errorMessage}
-	<div
-		class="alert alert-danger mb-4 position-fixed top-0 end-0 mt-0 me-0 w-100 py-4 text-center"
-		role="alert"
-	>
-		{errorMessage}
-	</div>
-{/if} -->
 {#if selectedPackage}
 	{#if form?.success === false && form?.message}
 		<div class="row justify-content-center">
@@ -168,27 +170,38 @@
 		<div class="col-12 col-md-9">
 			<form
 				method="post"
-				action={data.paymentData.gatewayUrl}
+				action="/hash-handler?seamless=true"
 				class="space-y-6"
 				onsubmit={getAllFormData}
 			>
+				<!-- <form method="post" action={data.paymentData.gatewayUrl} class="space-y-6"> -->
 				<!-- Hidden payment parameters -->
 				<input type="hidden" name="Desc1" value={encodedPageData} />
 				<input type="hidden" name="clientid" value={data.paymentData.clientid} />
 				<input type="hidden" name="storetype" value={data.paymentData.storetype} />
-				<input type="hidden" name="hash" value={data.paymentData.hash} />
-				<input type="hidden" name="islemtipi" value={data.paymentData.islemtipi} />
+				<input type="hidden" name="hashAlgorithm" value={data.paymentData.hashAlgorithm} />
+				<input type="hidden" name="TranType" value={data.paymentData.islemtipi} />
 				<input type="hidden" name="amount" value={data.paymentData.amount} />
 				<input type="hidden" name="currency" value={data.paymentData.currency} />
 				<input type="hidden" name="oid" value={data.paymentData.oid} />
-				<input type="hidden" name="okUrl" value={data.paymentData.okUrl} />
+				<input type="hidden" name="okurl" value={data.paymentData.okUrl} />
 				<input type="hidden" name="failUrl" value={data.paymentData.failUrl} />
+				<input type="hidden" name="Instalment" value={data.paymentData.Instalment} />
 				<input type="hidden" name="lang" value={data.paymentData.lang} />
 				<input type="hidden" name="rnd" value={data.paymentData.rnd} />
-				<input type="hidden" name="firmaadi" value={formData.name} />
+				<input type="hidden" name="callbackUrl" value={data.paymentData.okUrl} />
+				<!-- Card number without spaces for Netspay -->
+				<input type="hidden" name="pan" value={formData.no.replace(/\s/g, '')} />
+				<input type="hidden" name="BillToName" value={formData.name} />
 				<div class="row">
 					<!-- This will be col-8 on desktop, but appear second on mobile -->
 					<div class="col-12 col-md-8 order-1 order-md-2 pe-4 mb-4 mb-md-0">
+						{#if errorMessage}
+							<div class="alert alert-danger mb-4 mt-0 me-0 w-100 py-4 text-center" role="alert">
+								{errorMessage}
+							</div>
+						{/if}
+
 						<div class="mb-4">
 							<h4 class="mb-0 text-muted">Kart Bilgileri</h4>
 							<span class="text-muted">Devam etmek için lütfen kart bilgilerinizi giriniz.</span>
@@ -200,7 +213,6 @@
 							<label for="name" class="form-label">Kart Sahibi <code>*</code></label>
 							<input
 								bind:value={formData.name}
-								name="name"
 								type="text"
 								class="form-control"
 								id="name"
@@ -218,7 +230,6 @@
 							<label for="vkn" class="form-label">Kart Numarası <code>*</code></label>
 							<input
 								bind:value={formData.no}
-								name="pan"
 								type="text"
 								class="form-control"
 								id="no"

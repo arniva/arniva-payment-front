@@ -65,6 +65,13 @@
 			id="yearInput"
 			name="Ecom_Payment_Card_ExpDate_Year"
 			bind:this={yearInput}
+			bind:value={year}
+			oninput={checkYearIsValid}
+			onkeyup={checkBackspace}
+			type="hidden"
+		/>
+		<input
+			bind:this={yearInput}
 			bind:value={yearSimple}
 			oninput={checkYearIsValid}
 			onkeyup={checkBackspace}
