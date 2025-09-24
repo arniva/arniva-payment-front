@@ -100,9 +100,8 @@ export const load = (async ({ url, parent }) => {
     // const origin = url.origin;
     // const okUrl = dev ? `${origin}/paymentsuccess` : 'https://odeme.arniva.tr/paymentsuccess';
     // const failUrl = dev ? `${origin}/credits/payment?status=failed` : 'https://odeme.arniva.tr/credits/payment?status=failed';
-    
-    // Hash will be calculated by the hash handler with all form parameters including card details
-    
+
+
     return {
         urlData,
         paymentData: {
