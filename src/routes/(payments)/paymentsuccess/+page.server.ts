@@ -62,50 +62,13 @@ export const actions: Actions = {
 
         let Desc1 = formData.get('Desc1');
         let decoded = null;
-        let saveResult = false;
         let packageInfo = null;
         if(Desc1) {
             const decodedRaw = decodeURIComponent(atob(Desc1.toString()));
             decoded = JSON.parse(decodedRaw);
-            console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-            console.log("Decoded Desc1:", decoded);
-            console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-
-            const postBody = {
-                vtc: decoded.vkn,
-                unvan: decoded.unvan,
-                aciklama: decoded.description,
-                paket_id: decoded.selectedPackageId,
-                taksit: 1,
-                kart4: Number(String(formData.get('MaskedPan')).slice(-4)),
-                kartsahibi: formData.get('firmaadi'),
-                adres: decoded.adres,
-                il: decoded.il,
-                ilce: decoded.ilce,
-            }            
-
-
-            const postRes = await fetch('https://payment-api.arniva.tr/v1/hareketler', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(postBody)
-            });
-            
-            if (postRes.ok) {
-                const json = await postRes.json();
-                if (json && json.code === 0) {
-                    saveResult = true;
-                } else {
-                    saveResult = false;
-                }
-            } else {
-                saveResult = false;
-            }
         }
 
-        if(saveResult) {
+        if(decoded) {
             let packages = []
             const packagesRes = await fetch('https://payment-api.arniva.tr/v1/paketler');
             if (packagesRes.ok) {
@@ -132,7 +95,6 @@ export const actions: Actions = {
             success: true,
             data: formResult,
             decoded: decoded,
-            saveResult,
             packageInfo,
             hashValid: isHashValid
         }
