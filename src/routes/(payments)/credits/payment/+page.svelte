@@ -4,7 +4,7 @@
 	import MesafeliSatisSozlesmesi from './MesafeliSatisSozlesmesi.svelte';
 	import IptalVeIadeKosullari from './IptalVeIadeKosullari.svelte';
 	import { calculateInstallmentAmount, formatTurkishCurrency } from './functions.svelte';
-	import InstallmentOptionsBox from './InstallmentOptionsBox.svelte';
+	// import InstallmentOptionsBox from './InstallmentOptionsBox.svelte';
 	import MonthYearSelect from './MonthYearSelect.svelte';
 	import YearSelect from './YearSelect.svelte';
 	import type { Package } from '../types';
@@ -17,8 +17,7 @@
 
 	let pageData = $state(data?.urlData || form?.urlData || null);
 	const encodedPageData = $derived(btoa(encodeURIComponent(JSON.stringify(pageData))));
-	$inspect('pageData', pageData);
-	$inspect('form', form);
+	// Payment data will be generated dynamically in hash-handler
 
 	let selectedPackage = $derived(
 		pageData?.selectedPackageId
@@ -36,8 +35,6 @@
 		price: 0
 	});
 
-	let maxYear = new Date().getFullYear() + 10;
-	let minYear = new Date().getFullYear();
 	let cardValid = $derived.by(() => {
 		return (
 			formData.name.trim() !== '' &&
@@ -98,93 +95,9 @@
 		toast.danger(errorMessage);
 	}
 
-	$effect(() => {
-		// // Handle form action errors
-		// if (form && form.message && form.message !== lastShownMessage) {
-		// 	errorMessage = form.message;
-		// 	if (errorMessage) {
-		// 		toast.danger(errorMessage);
-		// 		lastShownMessage = errorMessage;
-		// 		errorMessage = '';
-		// 	}
-		// }
-		// // Handle payment errors from load function (failed payment redirects)
-		// if (
-		// 	data.paymentError &&
-		// 	data.paymentError.show &&
-		// 	data.paymentError.message !== lastShownMessage
-		// ) {
-		// 	errorMessage = data.paymentError.message;
-		// 	if (errorMessage) {
-		// 		toast.danger(errorMessage);
-		// 		lastShownMessage = errorMessage;
-		// 		errorMessage = '';
-		// 	}
-		// }
-		// if (form && form.data?.cardBody) {
-		// 	const cardBody = form.data.cardBody;
-		// 	formData = {
-		// 		name: typeof cardBody.name === 'string' ? cardBody.name : '',
-		// 		no: typeof cardBody.no === 'string' ? cardBody.no : '',
-		// 		cvc: typeof cardBody.cvc === 'string' ? cardBody.cvc : '',
-		// 		validUntilMonth:
-		// 			typeof cardBody.validUntilMonth === 'string' ? cardBody.validUntilMonth : '',
-		// 		validUntilYear: typeof cardBody.validUntilYear === 'string' ? cardBody.validUntilYear : '',
-		// 		installment: typeof cardBody.installment === 'string' ? Number(cardBody.installment) : 1,
-		// 		price: typeof cardBody.price === 'string' ? Number(cardBody.price) : 0
-		// 	};
-		// }
-		// if (form && form.data?.encodedPageData) {
-		// 	pageData = form.data.encodedPageData;
-		// }
-	});
-
-	async function getAllFormData(event: Event) {
-		// console.log all form data before submit
-		event.preventDefault();
-
-		// const postBody = {
-		// 	vtc: pageData.vkn,
-		// 	unvan: pageData.unvan,
-		// 	aciklama: pageData.description,
-		// 	paket_id: pageData.selectedPackageId,
-		// 	taksit: 1,
-		// 	kart4: Number(String(formData.no).slice(-4)),
-		// 	kartsahibi: formData.name,
-		// 	adres: pageData.adres,
-		// 	il: pageData.il,
-		// 	ilce: pageData.ilce
-		// };
-
-		// const postRes = await fetch('https://payment-api.arniva.tr/v1/hareketler', {
-		// 	method: 'POST',
-		// 	headers: {
-		// 		'Content-Type': 'application/json'
-		// 	},
-		// 	body: JSON.stringify(postBody)
-		// });
-
-		// console.log('Post response status:', postRes);
-
-		// if (postRes.ok) {
-		// 	const result = await postRes.json();
-		// 	console.log('Post response data:', result);
-
-		// 	if (result && result.code === 0 && result.data?.id) {
-		// 		let oid = result.data.id;
-		// 	}
-		// }
-
-		// return;
-
-		let form = event.target as HTMLFormElement;
-		let netspayFormData = new FormData(form);
-		for (let [key, value] of netspayFormData.entries()) {
-			console.log(`${key}: ${value}`);
-		}
-		setTimeout(() => {
-			form.submit();
-		}, 100);
+	function getAllFormData(event: Event) {
+		console.log('Form being submitted to hash-handler...');
+		// Let the form submit naturally to hash-handler - no preventDefault needed
 		return true;
 	}
 </script>
@@ -209,25 +122,23 @@
 				class="space-y-6"
 				onsubmit={getAllFormData}
 			>
-				<!-- <form method="post" action={data.paymentData.gatewayUrl} class="space-y-6"> -->
-				<!-- Hidden payment parameters -->
+				<!-- Essential data for hash-handler -->
 				<input type="hidden" name="Desc1" value={encodedPageData} />
-				<input type="hidden" name="clientid" value={data.paymentData.clientid} />
-				<input type="hidden" name="storetype" value={data.paymentData.storetype} />
-				<input type="hidden" name="hashAlgorithm" value={data.paymentData.hashAlgorithm} />
-				<input type="hidden" name="TranType" value={data.paymentData.islemtipi} />
-				<input type="hidden" name="amount" value={data.paymentData.amount} />
-				<input type="hidden" name="currency" value={data.paymentData.currency} />
-				<input type="hidden" name="oid" value={data.paymentData.oid} />
-				<input type="hidden" name="okurl" value={data.paymentData.okUrl} />
-				<input type="hidden" name="failUrl" value={data.paymentData.failUrl} />
-				<input type="hidden" name="Instalment" value={data.paymentData.Instalment} />
-				<input type="hidden" name="lang" value={data.paymentData.lang} />
-				<input type="hidden" name="rnd" value={data.paymentData.rnd} />
-				<input type="hidden" name="callbackUrl" value={data.paymentData.callbackUrl} />
-				<!-- Card number without spaces for Netspay -->
+				<input type="hidden" name="Instalment" value={formData.installment} />
+				<!-- Card details for Netspay -->
 				<input type="hidden" name="pan" value={formData.no.replace(/\s/g, '')} />
 				<input type="hidden" name="BillToName" value={formData.name} />
+				<input type="hidden" name="cv2" value={formData.cvc} />
+				<input
+					type="hidden"
+					name="Ecom_Payment_Card_ExpDate_Month"
+					value={formData.validUntilMonth}
+				/>
+				<input
+					type="hidden"
+					name="Ecom_Payment_Card_ExpDate_Year"
+					value={formData.validUntilYear}
+				/>
 				<div class="row">
 					<!-- This will be col-8 on desktop, but appear second on mobile -->
 					<div class="col-12 col-md-8 order-1 order-md-2 pe-4 mb-4 mb-md-0">
@@ -278,45 +189,6 @@
 
 						<div class="d-flex gap-3 align-items-center">
 							<div class="d-block d-lg-flex gap-3">
-								<!-- <div class="mb-3">
-								<label for="validUntilMonth" class="form-label">Ay <code>*</code></label>
-								<select
-									bind:value={formData.validUntilMonth}
-									name="validUntilMonth"
-									class="form-select"
-									id="validUntilMonth"
-									required
-									onchange={() => {
-										if (yearComponent) yearComponent.open();
-									}}
-								>
-									<option value="">Ay seçiniz</option>
-									<option value="01">01 - Ocak</option>
-									<option value="02">02 - Şubat</option>
-									<option value="03">03 - Mart</option>
-									<option value="04">04 - Nisan</option>
-									<option value="05">05 - Mayıs</option>
-									<option value="06">06 - Haziran</option>
-									<option value="07">07 - Temmuz</option>
-									<option value="08">08 - Ağustos</option>
-									<option value="09">09 - Eylül</option>
-									<option value="10">10 - Ekim</option>
-									<option value="11">11 - Kasım</option>
-									<option value="12">12 - Aralık</option>
-								</select>
-							</div>
-							<div class="mb-3">
-								<YearSelect
-									onChange={() => {
-										if (cvcInput) cvcInput.focus();
-									}}
-									bind:this={yearComponent}
-									{maxYear}
-									{minYear}
-									bind:value={formData.validUntilYear}
-								/>
-							</div> -->
-
 								<div class="mb-3">
 									<MonthYearSelect
 										onChange={() => {
