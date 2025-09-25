@@ -1,19 +1,6 @@
 import type { PageServerLoad, Actions } from './$types';
 import { redirect } from '@sveltejs/kit';
 import type { Package } from '../types';
-import { dev } from '$app/environment';
-import { 
-    TEST_NESTPAY_CLIENT_ID,
-    TEST_NESTPAY_STORE_KEY,
-    TEST_NESTPAY_GATEWAY_URL,
-    LIVE_NESTPAY_CLIENT_ID,
-    LIVE_NESTPAY_STORE_KEY,
-    LIVE_NESTPAY_GATEWAY_URL,
-    NESTPAY_CURRENCY,
-    NESTPAY_LANGUAGE,
-    NESTPAY_STORE_TYPE,
-    IS_TESTING
-} from '$env/static/private';
 
 function decodeFormData(d: string | null) {  
   if (d) {
@@ -28,22 +15,11 @@ function decodeFormData(d: string | null) {
 }
 
 export const load = (async ({ url, parent }) => {
-    // TODO: Fail olduğundaki senaryoya da bakmak lazım. Aşağıda form actions ile bağlantılı.
-    // Şu anda credits sayfasına redirect yapıyor. çünkü amount bilgisi için package bilgisine ihtiyaç var.
     const urlRawData = url.searchParams.get('data');
     const urlData = decodeFormData(urlRawData);
     const status = url.searchParams.get('status');
 
     const { packages } = await parent();
-
-    // if(!packages || !urlData || !urlData.selectedPackageId) {
-    //   redirect(302, '/credits');
-    // }
-    
-    let selectedPackage = packages.find((pkg: Package) => pkg.id === urlData?.selectedPackageId) || null;
-    // if(!selectedPackage) {
-    //     redirect(302, '/credits');
-    // }
     
     // Check if this is a failed payment return
     let paymentError = null;
@@ -54,72 +30,9 @@ export const load = (async ({ url, parent }) => {
         };
     }
     
-    // console.log("selectedPackage:", selectedPackage);
-    const oid = Date.now().toString();
-    
-    // Payment parameters
-    const amount = selectedPackage?.total?.toFixed(2); // 1 Turkish Lira
-    const currency = NESTPAY_CURRENCY; // 949 for TL
-    
-    // Determine environment variables based on dev/prod and IS_TESTING
-    let clientid: string;
-    let storekey: string;
-    let gatewayUrl: string;
-    let okUrl: string;
-    let failUrl: string;
-
-
-    if (dev) {
-        // Production: always use live variables
-        clientid = TEST_NESTPAY_CLIENT_ID;
-        storekey = TEST_NESTPAY_STORE_KEY;
-        gatewayUrl = TEST_NESTPAY_GATEWAY_URL;
-        okUrl = `${url.origin}/paymentsuccess`;
-        failUrl = `${url.origin}/credits/payment?status=failed`;
-    } else {
-        // Development: use test if IS_TESTING is true, else live
-        if (IS_TESTING === 'true') {
-            clientid = TEST_NESTPAY_CLIENT_ID;
-            storekey = TEST_NESTPAY_STORE_KEY;
-            gatewayUrl = TEST_NESTPAY_GATEWAY_URL;
-        } else {
-            clientid = LIVE_NESTPAY_CLIENT_ID;
-            storekey = LIVE_NESTPAY_STORE_KEY;
-            gatewayUrl = LIVE_NESTPAY_GATEWAY_URL;
-        }
-        okUrl = 'https://odeme.arniva.tr/paymentsuccess';
-        failUrl = 'https://odeme.arniva.tr/credits/payment?status=failed';
-    }
-    
-    const storetype = NESTPAY_STORE_TYPE; // 3d_pay
-    const islemtipi = "Auth";
-    const lang = NESTPAY_LANGUAGE; // tr
-    const rnd = Math.random().toString(36).substring(2, 15);
-    
-    // URLs for success and failure redirects
-    // const origin = url.origin;
-    // const okUrl = dev ? `${origin}/paymentsuccess` : 'https://odeme.arniva.tr/paymentsuccess';
-    // const failUrl = dev ? `${origin}/credits/payment?status=failed` : 'https://odeme.arniva.tr/credits/payment?status=failed';
-
 
     return {
         urlData,
-        paymentData: {
-            clientid,
-            storetype,
-            hashAlgorithm: 'ver3',
-            islemtipi,
-            amount,
-            currency,
-            oid,
-            okUrl,
-            failUrl,
-            callbackUrl: 'https://payment-api.arniva.tr/v1/callback',
-            lang,
-            rnd,
-            Instalment: '', // Required for Hash V3
-            gatewayUrl: gatewayUrl
-        },
         custom: {
             title: 'Ödeme',
             step: 3,
