@@ -124,7 +124,7 @@
 			>
 				<!-- Essential data for hash-handler -->
 				<input type="hidden" name="Desc1" value={encodedPageData} />
-				<input type="hidden" name="Instalment" value={formData.installment} />
+				<!-- <input type="hidden" name="Instalment" value={formData.installment} /> -->
 				<!-- Card details for Netspay -->
 				<input type="hidden" name="pan" value={formData.no.replace(/\s/g, '')} />
 				<input type="hidden" name="BillToName" value={formData.name} />
