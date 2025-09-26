@@ -1,5 +1,5 @@
 <script>
-	import { calculateInstallmentAmount, formatTurkishCurrency } from './functions.svelte';
+	import { calculateInstallmentAmount, formatTurkishCurrency } from '@functions/functions.svelte';
 	let { selectedPackage, formData = $bindable(), installmentOptions } = $props();
 </script>
 

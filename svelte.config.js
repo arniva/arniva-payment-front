@@ -13,13 +13,10 @@ const config = {
 			checkOrigin: false,
 		},
 		alias: {
-			'@modules': './src/lib/elements/modules',
 			'@components': './src/lib/components',
 			'@styles': './src/lib/styles/app.scss',
-			'@api': './src/lib/core/api',
-			'@models': './src/lib/core/models',
-			'@functions': './src/lib/core/functions',
-			'@helpers': './src/lib/core/helpers'
+			'@functions': './src/lib/functions',
+			'@helpers': './src/lib/helpers'
 		}
 	}
 };
