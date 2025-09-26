@@ -71,6 +71,7 @@
 			type="hidden"
 		/>
 		<input
+			id="yearInput2"
 			bind:this={yearInput}
 			bind:value={yearSimple}
 			oninput={checkYearIsValid}
@@ -83,13 +84,13 @@
 
 <style>
 	input {
-		max-width: 35px;
+		max-width: 40px;
 	}
 	#monthInput {
 		padding-right: 0;
 		text-align: right;
 	}
-	#yearInput {
+	#yearInput2 {
 		padding-left: 0;
 		text-align: left;
 	}

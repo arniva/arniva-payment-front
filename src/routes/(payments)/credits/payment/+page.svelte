@@ -15,7 +15,7 @@
 	let yearComponent: YearSelect;
 	let cvcInput: HTMLInputElement | null;
 
-	let pageData = $state(data?.urlData || form?.urlData || null);
+	let pageData = $state(data?.urlData || null);
 	const encodedPageData = $derived(btoa(encodeURIComponent(JSON.stringify(pageData))));
 	// Payment data will be generated dynamically in hash-handler
 
@@ -285,12 +285,18 @@
 									>'nı okudum anladım.</label
 								>
 							</div>
-
 							<button
 								type="submit"
-								class="btn btn-lg btn-arniva text-white mb-4"
+								class="btn btn-lg btn-arniva text-white mb-4 position-relative w-100"
 								disabled={!cardValid || !confirmCheck}
-								>Ödeme Yap <i class="bi bi-arrow-right"></i></button
+							>
+								<span
+									class="position-absolute fs-5 top-0 start-100 translate-middle badge bg-success"
+								>
+									3D
+									<span class="visually-hidden">unread messages</span>
+								</span>
+								Ödeme Yap <i class="bi bi-arrow-right"></i></button
 							>
 							<div class="d-flex align-items-center justify-content-between mb-3">
 								<span class="text-muted fs-6">Paket</span>
