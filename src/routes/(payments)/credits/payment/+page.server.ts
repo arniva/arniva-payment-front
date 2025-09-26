@@ -1,7 +1,6 @@
 import type { PageServerLoad, Actions } from './$types';
 import { redirect } from '@sveltejs/kit';
-import type { Package } from '../types';
-import { getPaymentErrorMessage } from './functions.svelte'
+import { getPaymentErrorMessage } from '@functions/functions.svelte'
 
 function decodeFormData(d: string | null) {  
   if (d) {

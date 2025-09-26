@@ -1,12 +1,14 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
-	import CreditCard from './CreditCard.svelte';
-	import MesafeliSatisSozlesmesi from './MesafeliSatisSozlesmesi.svelte';
-	import IptalVeIadeKosullari from './IptalVeIadeKosullari.svelte';
-	import { calculateInstallmentAmount, formatTurkishCurrency } from './functions.svelte';
-	// import InstallmentOptionsBox from './InstallmentOptionsBox.svelte';
-	import MonthYearSelect from './MonthYearSelect.svelte';
-	import YearSelect from './YearSelect.svelte';
+	import {
+		CreditCard,
+		MesafeliSatisSozlesmesi,
+		IptalVeIadeKosullari,
+		MonthYearSelect,
+		YearSelect
+	} from '@components';
+	import { calculateInstallmentAmount, formatTurkishCurrency } from '@functions/functions.svelte';
+	// import { InstallmentOptionsBox } from '@components';
 	import type { Package } from '../types';
 	import { toast } from '@ruzgardogu/utils';
 
