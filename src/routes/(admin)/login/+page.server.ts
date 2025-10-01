@@ -16,7 +16,7 @@ export const actions: Actions = {
         const password = formData.get('password');
         const username = formData.get('username');
         console.log(password, username);
-        if (password === '12345' && username === 'arnivaadmin') {
+        if (password === 'Arniva@1453' && username === 'admin') {
             cookies.set('auth', 'true', {
                 path: '/',
                 httpOnly: true,
