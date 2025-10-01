@@ -1,4 +1,5 @@
 <script lang="ts">
+	import 'bootstrap/dist/css/bootstrap.min.css';
 	import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.js?url';
 	import { Navbar } from '@components';
 	import '@styles';
