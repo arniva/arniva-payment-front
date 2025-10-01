@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
+	import { invalidateAll } from '$app/navigation';
 
 	let { data }: PageProps = $props();
 	let { movements, pagination, error } = data;
@@ -8,12 +9,20 @@
 	let selected = $state(null as string | null);
 
 	async function changeStatus(id: string) {
+		let confirmed = confirm(
+			'Durumu "Kontör Yüklendi" olarak değiştirmek istediğinize emin misiniz?'
+		);
+		if (!confirmed || !id) return;
 		try {
+			console.log('id', id);
 			const response = await fetch(`https://payment-api.arniva.tr/v1/hareketler/${id}`, {
-				method: 'POST'
+				method: 'PUT'
 			});
+			console.log('response', response);
 			if (response.ok) {
-				alert('Durum başarıyla değiştirildi.');
+				const responseData = await response.json();
+				console.log('responseData', responseData);
+				invalidateAll();
 				location.reload();
 			} else {
 				const errorData = await response.json();
@@ -33,22 +42,22 @@
 		switch (durum) {
 			case 0:
 				return {
-					text: 'Ödeme Bekleniyor',
+					text: 'Bekleniyor',
 					class: 'badge bg-warning'
 				};
 			case 1:
 				return {
-					text: 'Ödeme Yapıldı',
+					text: 'Ödendi',
 					class: 'badge bg-success'
 				};
 			case 2:
 				return {
-					text: 'Kontör Yüklendi',
+					text: 'Yüklendi',
 					class: 'badge bg-primary'
 				};
 			case -1:
 				return {
-					text: 'Hatalı İşlem',
+					text: 'Hatalı',
 					class: 'badge bg-danger'
 				};
 			default:
@@ -57,6 +66,13 @@
 					class: 'badge bg-secondary'
 				};
 		}
+	}
+
+	function getUnvanText(unvan: string) {
+		if (unvan.length > 30) {
+			return unvan.slice(0, 27) + '...';
+		}
+		return unvan;
 	}
 </script>
 
@@ -99,9 +115,9 @@
 		<table class="table table-striped table-hover">
 			<thead>
 				<tr>
-					<th>VTC</th>
+					<th class="d-none d-lg-table-cell">VTC</th>
 					<th>Unvan</th>
-					<th>Adet</th>
+					<th class="d-none d-lg-table-cell">Adet</th>
 					<th>Toplam</th>
 					<th>Durum</th>
 					<th>İşlemler</th>
@@ -110,10 +126,11 @@
 			<tbody>
 				{#each movements as movement}
 					{@const durum = getDurum(movement.durum)}
+					{@const unvanText = getUnvanText(movement.unvan)}
 					<tr>
-						<td>{movement.vtc}</td>
-						<td>{movement.unvan}</td>
-						<td>{movement.adet}</td>
+						<td class="d-none d-lg-table-cell">{movement.vtc}</td>
+						<td>{unvanText}</td>
+						<td class="d-none d-lg-table-cell">{movement.adet}</td>
 						<td>{movement.toplam}</td>
 						<td>
 							<span class={durum.class}>{durum.text}</span>
@@ -123,18 +140,20 @@
 								<button
 									data-bs-toggle="modal"
 									data-bs-target="#detailsModal"
-									class="btn btn-sm btn-outline-secondary"
+									class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1"
 									onclick={() => (selected = movement.id)}
 								>
-									İncele
+									<i class="bi bi-eye"></i>
+									<span class="d-none d-lg-flex"> İncele </span>
 								</button>
 								{#if movement.durum !== 2 && movement.tip === 2}
 									<button
 										disabled={movement.durum === 2}
-										class="btn btn-sm btn-danger"
+										class="btn btn-sm btn-danger d-flex align-items-center gap-1"
 										onclick={() => changeStatus(movement.id)}
 									>
-										Değiştir
+										<i class="bi bi-arrow-left-right"></i>
+										<span class="d-none d-lg-flex"> Değiştir</span>
 									</button>
 								{/if}
 							</div>
