@@ -43,6 +43,7 @@ export function getPaymentErrorMessage(formData: FormData): string {
     const mdStatus = formData.get('mdStatus')?.toString();
     const mdErrorMsg = formData.get('mdErrorMsg')?.toString();
     console.log("====================.");
+    console.log("errMsg:", errMsg);
     console.log("mdStatus:", mdStatus, "mdErrorMsg:", mdErrorMsg);
     console.log("====================.");
     // Check 3D Secure status first (Netspay specific mappings)

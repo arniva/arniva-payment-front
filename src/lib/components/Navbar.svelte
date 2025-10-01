@@ -30,7 +30,10 @@
 				></button>
 			</div>
 			<div class="offcanvas-body">
-				<ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+				<ul class="navbar-nav d-flex align-items-center gap-3 justify-content-end flex-grow-1 pe-3">
+					<li class="nav-item">
+						<a href="/admin" class="btn btn-outline-light">Admin Paneli</a>
+					</li>
 					<li class="nav-item">
 						<span>Arniva Ödeme Portalı</span>
 					</li>
