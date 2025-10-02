@@ -1,12 +1,41 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
 	import { invalidateAll } from '$app/navigation';
+	import { Pagination } from '@components';
+	import { onMount } from 'svelte';
+	import {
+		convertQueryObjectToString,
+		convertQueryStringToObject
+	} from '$lib/functions/query_convert.js';
 
 	let { data }: PageProps = $props();
 	let { movements, pagination, error } = data;
-	console.log('movements', movements);
-	console.log('pagination', pagination);
+
 	let selected = $state(null as string | null);
+
+	// Filter and search state
+	let searchTerm = $state('');
+	let searchColumn = $state('unvan'); // Default search column
+	let statusFilter = $state(''); // Empty string means no filter
+	let startDate = $state('');
+	let endDate = $state('');
+	let sortConfig = $state({ key: 'id', order: 'desc' } as { key: string; order: 'asc' | 'desc' });
+
+	// Available filter options based on the table columns
+	const statusOptions = [
+		{ value: '', label: 'Tümü' },
+		{ value: '0', label: 'Bekleniyor' },
+		{ value: '1', label: 'Ödendi' },
+		{ value: '2', label: 'Yüklendi' },
+		{ value: '-1', label: 'Hatalı' }
+	];
+
+	const searchColumns = [
+		{ value: 'unvan', label: 'Ünvan' },
+		{ value: 'vtc', label: 'VTC' },
+		{ value: 'aciklama', label: 'Açıklama' },
+		{ value: 'kartsahibi', label: 'Kart Sahibi' }
+	];
 
 	async function changeStatus(id: string) {
 		let confirmed = confirm(
@@ -14,14 +43,11 @@
 		);
 		if (!confirmed || !id) return;
 		try {
-			console.log('id', id);
 			const response = await fetch(`https://payment-api.arniva.tr/v1/hareketler/${id}`, {
 				method: 'PUT'
 			});
-			console.log('response', response);
 			if (response.ok) {
 				const responseData = await response.json();
-				console.log('responseData', responseData);
 				invalidateAll();
 				location.reload();
 			} else {
@@ -32,11 +58,6 @@
 			alert(`Hata: ${error}`);
 		}
 	}
-
-	// 0, ödeme bekleniyor
-	// 1, yapıldı
-	// 2, kontör yüklendi
-	// -1, Hatalı işlem
 
 	function getDurum(durum: number) {
 		switch (durum) {
@@ -74,40 +95,188 @@
 		}
 		return unvan;
 	}
+
+	// Filter and search functions
+	function applyFilters() {
+		const filter: any = {};
+
+		// Add search filter if search term exists
+		if (searchTerm.trim()) {
+			filter.search = {
+				column: searchColumn,
+				value: searchTerm.trim()
+			};
+		}
+
+		// Add status filter if selected
+		if (statusFilter) {
+			filter.durum = parseInt(statusFilter);
+		}
+
+		// Add date range filter if dates are provided
+		if (startDate || endDate) {
+			filter.created_at = {};
+			if (startDate) {
+				filter.created_at.start = startDate;
+			}
+			if (endDate) {
+				filter.created_at.end = endDate;
+			}
+		}
+
+		// Build query string
+		const queryString = convertQueryObjectToString(
+			{ offset: 0, limit: pagination?.limit || 10 },
+			filter,
+			sortConfig
+		);
+
+		// Navigate to new URL with filters
+		window.location.href = window.location.pathname + queryString;
+	}
+
+	function clearFilters() {
+		searchTerm = '';
+		statusFilter = '';
+		startDate = '';
+		endDate = '';
+		sortConfig = { key: 'id', order: 'desc' };
+		hasActiveFilters = false;
+		window.location.href =
+			window.location.pathname + '?offset=0&limit=' + (pagination?.limit || 10);
+	}
+
+	// Check if any filters are active (from URL)
+	let hasActiveFilters = $state(false);
+
+	// Check for active filters on mount
+	onMount(() => {
+		const urlParams = new URLSearchParams(window.location.search);
+		hasActiveFilters = urlParams.has('filter');
+	});
+	$effect(() => {
+		const urlParams = new URLSearchParams(window.location.search);
+		const { filter, sort } = convertQueryStringToObject(window.location.search);
+
+		if (filter.search) {
+			searchTerm = filter.search.value || '';
+			searchColumn = filter.search.column || 'unvan';
+		}
+
+		if (filter.durum !== undefined) {
+			statusFilter = filter.durum.toString();
+		}
+
+		if (filter.created_at && typeof filter.created_at === 'object') {
+			startDate = filter.created_at.start || '';
+			endDate = filter.created_at.end || '';
+		}
+
+		if (sort) {
+			sortConfig = sort;
+		}
+	});
 </script>
 
-<div class="d-flex align-items-center justify-content-between">
-	<h1 class="mb-4 border-bottom pb-3">Hareketler</h1>
+<div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between mb-3">
+	<h1 class="mb-4 mb-lg-0">Hareketler</h1>
 	{#if movements && pagination}
-		<nav aria-label="Page navigation">
-			<ul class="pagination justify-content-center">
-				<li class="page-item" class:disabled={pagination.offset <= 0}>
-					<a
-						class="page-link"
-						target="_self"
-						href="?offset={Math.max(
-							0,
-							pagination.offset - pagination.limit
-						)}&limit={pagination.limit}"><i class="bi bi-arrow-left-short"></i></a
-					>
-				</li>
-				<li class="page-item disabled">
-					<span class="page-link">Sayfa {pagination.page} / {pagination.totalPages}</span>
-				</li>
-				<li
-					class="page-item"
-					class:disabled={pagination.offset + pagination.limit >= pagination.total}
-				>
-					<a
-						class="page-link"
-						target="_self"
-						href="?offset={pagination.offset + pagination.limit}&limit={pagination.limit}"
-						><i class="bi bi-arrow-right-short"></i></a
-					>
-				</li>
-			</ul>
-		</nav>
+		<div class="d-flex align-items-center justify-content-between">
+			<button
+				data-bs-toggle="modal"
+				data-bs-target="#filterModal"
+				class="btn d-flex d-lg-none btn-outline-secondary mb-3">Filtrele</button
+			>
+			<Pagination {pagination} />
+		</div>
 	{/if}
+</div>
+
+{#if hasActiveFilters}
+	<div class="alert alert-info d-flex align-items-start align-items-lg-center" role="alert">
+		<i class="fs-3 bi bi-funnel-fill me-2"></i>
+		<span>Filtreler uygulandı. Sonuçlar filtrelenmiş olarak gösteriliyor.</span>
+		<button type="button" class="btn btn-sm btn-primary ms-auto" onclick={clearFilters}>
+			Temizle
+		</button>
+	</div>
+{/if}
+
+<!-- Search and Filter Section -->
+{#snippet filterBox()}
+	<div class="card mb-4 border-0">
+		<div class="card-body">
+			<div class="row g-3">
+				<!-- Search Section -->
+				<div class="col-lg-3 col-md-6">
+					<label for="searchColumn" class="form-label">Arama</label>
+					<div class="input-group">
+						<select class="form-select" id="searchColumn" bind:value={searchColumn}>
+							{#each searchColumns as column}
+								<option value={column.value}>{column.label}</option>
+							{/each}
+						</select>
+						<input
+							type="text"
+							class="form-control"
+							placeholder="Arama..."
+							bind:value={searchTerm}
+							onkeydown={(e) => {
+								if (e.key === 'Enter') {
+									applyFilters();
+								}
+							}}
+						/>
+					</div>
+				</div>
+
+				<!-- Status Filter -->
+				<div class="col-lg-2 col-md-3">
+					<label for="statusFilter" class="form-label">Durum</label>
+					<select class="form-select" id="statusFilter" bind:value={statusFilter}>
+						{#each statusOptions as option}
+							<option value={option.value}>{option.label}</option>
+						{/each}
+					</select>
+				</div>
+
+				<!-- Date Range Filter -->
+				<div class="col-lg-4 col-md-6">
+					<label class="form-label">Tarih Aralığı</label>
+					<div class="row g-2">
+						<div class="col-6">
+							<input
+								type="date"
+								class="form-control"
+								placeholder="Başlangıç"
+								bind:value={startDate}
+							/>
+						</div>
+						<div class="col-6">
+							<input type="date" class="form-control" placeholder="Bitiş" bind:value={endDate} />
+						</div>
+					</div>
+				</div>
+
+				<!-- Action Buttons -->
+				<div class="col-lg-3 col-md-6">
+					<label class="form-label">&nbsp;</label>
+					<div class="d-flex gap-2">
+						<button class="btn btn-danger flex-fill" onclick={applyFilters}>
+							<i class="bi bi-search"></i> Filtrele
+						</button>
+						<button class="btn btn-outline-secondary flex-fill" onclick={clearFilters}>
+							<i class="bi bi-x-circle"></i> Temizle
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{/snippet}
+
+<div class="d-none d-lg-block">
+	{@render filterBox()}
 </div>
 
 {#if movements && pagination}
@@ -159,6 +328,10 @@
 							</div>
 						</td>
 					</tr>
+				{:else}
+					<tr>
+						<td colspan="6" class="text-center fs-6 py-3 text-danger">Kayıt bulunamadı.</td>
+					</tr>
 				{/each}
 			</tbody>
 		</table>
@@ -200,7 +373,7 @@
 								<td>{selectedItem.vtc}</td>
 							</tr>
 							<tr>
-								<th>Unvan</th>
+								<th>Ünvan</th>
 								<td>{selectedItem.unvan}</td>
 							</tr>
 							<tr>
@@ -260,6 +433,10 @@
 								</td>
 							</tr>
 							<tr>
+								<th>Oluşturulma Tarihi</th>
+								<td>{selectedItem.created_at || '-'}</td>
+							</tr>
+							<tr>
 								<th>Hata</th>
 								<td>{selectedItem.hata || '-'}</td>
 							</tr>
@@ -273,3 +450,38 @@
 		</div>
 	</div>
 </div>
+
+<div
+	class="modal fade"
+	id="filterModal"
+	tabindex="-1"
+	aria-labelledby="filterModalLabel"
+	aria-hidden="true"
+>
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header border-0">
+				<h1 class="modal-title fs-5" id="filterModalLabel">Filtrele</h1>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				{@render filterBox()}
+			</div>
+			<div class="modal-footer border-0">
+				<button type="button" class="btn btn-secondary">Kapat</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<style>
+	.w-35 {
+		width: 35% !important;
+	}
+	.w-65 {
+		width: 65% !important;
+	}
+	#searchColumn {
+		max-width: 120px;
+	}
+</style>
