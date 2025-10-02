@@ -5,3 +5,4 @@ export { default as IptalVeIadeKosullari } from './IptalVeIadeKosullari.svelte';
 export { default as MesafeliSatisSozlesmesi } from './MesafeliSatisSozlesmesi.svelte';
 export { default as MonthYearSelect } from './MonthYearSelect.svelte';
 export { default as YearSelect } from './YearSelect.svelte';
+export { default as Pagination } from './Pagination.svelte';
