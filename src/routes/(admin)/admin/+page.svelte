@@ -176,6 +176,40 @@
 			sortConfig = sort;
 		}
 	});
+
+	function formatTurkishLira(value: number): string {
+		return value.toLocaleString('tr-TR', {
+			style: 'currency',
+			currency: 'TRY'
+		});
+	}
+
+	const monthNames = [
+		'Ocak',
+		'Şubat',
+		'Mart',
+		'Nisan',
+		'Mayıs',
+		'Haziran',
+		'Temmuz',
+		'Ağustos',
+		'Eylül',
+		'Ekim',
+		'Kasım',
+		'Aralık'
+	];
+
+	// Format date to DD.MM.YYYY HH:mm from 2025-10-03T09:55:56.603015Z
+	function formatDate(dateString: string): string {
+		if (!dateString) return '-';
+		const date = new Date(dateString);
+		const day = String(date.getDate()).padStart(2, '0');
+		const monthName = monthNames[date.getMonth()];
+		const year = date.getFullYear();
+		const hours = String(date.getHours()).padStart(2, '0');
+		const minutes = String(date.getMinutes()).padStart(2, '0');
+		return `${day} ${monthName} ${year} - ${hours}:${minutes}`;
+	}
 </script>
 
 <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between mb-3">
@@ -275,15 +309,12 @@
 	</div>
 {/snippet}
 
-<div class="d-none d-lg-block">
-	{@render filterBox()}
-</div>
-
-{#if movements && pagination}
+{#snippet table()}
 	<div class="table-responsive">
 		<table class="table table-striped table-hover">
 			<thead>
 				<tr>
+					<th>Tarih</th>
 					<th class="d-none d-lg-table-cell">VTC</th>
 					<th>Unvan</th>
 					<th class="d-none d-lg-table-cell">Adet</th>
@@ -296,38 +327,50 @@
 				{#each movements as movement}
 					{@const durum = getDurum(movement.durum)}
 					{@const unvanText = getUnvanText(movement.unvan)}
-					<tr>
-						<td class="d-none d-lg-table-cell">{movement.vtc}</td>
-						<td>{unvanText}</td>
-						<td class="d-none d-lg-table-cell">{movement.adet}</td>
-						<td>{movement.toplam}</td>
-						<td>
-							<span class={durum.class}>{durum.text}</span>
-						</td>
-						<td>
-							<div class="d-flex gap-2">
-								<button
-									data-bs-toggle="modal"
-									data-bs-target="#detailsModal"
-									class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1"
-									onclick={() => (selected = movement.id)}
-								>
-									<i class="bi bi-eye"></i>
-									<span class="d-none d-lg-flex"> İncele </span>
-								</button>
-								{#if movement.durum !== 2 && movement.tip === 2}
+					{@const isToday =
+						new Date(movement.created_at).toDateString() === new Date().toDateString()}
+					{#if movement}
+						<tr>
+							<td>
+								<div class="d-flex flex-row">
+									{formatDate(movement.created_at)}
+									{#if isToday}
+										<span class="badge bg-success text-white ms-2">Bugün</span>
+									{/if}
+								</div>
+							</td>
+							<td class="d-none d-lg-table-cell">{movement.vtc}</td>
+							<td>{unvanText}</td>
+							<td class="d-none d-lg-table-cell">{movement.adet}</td>
+							<td>{formatTurkishLira(movement.toplam)}</td>
+							<td>
+								<span class={durum.class}>{durum.text}</span>
+							</td>
+							<td>
+								<div class="d-flex gap-2">
 									<button
-										disabled={movement.durum === 2}
-										class="btn btn-sm btn-danger d-flex align-items-center gap-1"
-										onclick={() => changeStatus(movement.id)}
+										data-bs-toggle="modal"
+										data-bs-target="#detailsModal"
+										class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1"
+										onclick={() => (selected = movement.id)}
 									>
-										<i class="bi bi-arrow-left-right"></i>
-										<span class="d-none d-lg-flex"> Değiştir</span>
+										<i class="bi bi-eye"></i>
+										<span class="d-none d-lg-flex"> İncele </span>
 									</button>
-								{/if}
-							</div>
-						</td>
-					</tr>
+									{#if movement.durum !== 2 && movement.tip === 2}
+										<button
+											disabled={movement.durum === 2}
+											class="btn btn-sm btn-danger d-flex align-items-center gap-1"
+											onclick={() => changeStatus(movement.id)}
+										>
+											<i class="bi bi-arrow-left-right"></i>
+											<span class="d-none d-lg-flex"> Değiştir</span>
+										</button>
+									{/if}
+								</div>
+							</td>
+						</tr>
+					{/if}
 				{:else}
 					<tr>
 						<td colspan="6" class="text-center fs-6 py-3 text-danger">Kayıt bulunamadı.</td>
@@ -335,6 +378,78 @@
 				{/each}
 			</tbody>
 		</table>
+	</div>
+{/snippet}
+
+{#snippet card()}
+	<div class="row g-3">
+		{#each movements as movement}
+			{@const durum = getDurum(movement.durum)}
+			{@const unvanText = getUnvanText(movement.unvan)}
+			{@const isToday = new Date(movement.created_at).toDateString() === new Date().toDateString()}
+			{#if movement}
+				<div class="col-12">
+					<div class="card shadow-sm">
+						<div class="card-body">
+							<div class="d-flex justify-content-between align-items-start gap-3">
+								<div>
+									<h5 class="card-title mb-1">{unvanText}</h5>
+									<p class="card-text mb-1">
+										{#if isToday}
+											<span class="badge bg-success text-white me-1">Bugün</span>
+										{/if}
+										{formatDate(movement.created_at)}
+									</p>
+									<p class="card-text mb-1">Adet: {movement.adet}</p>
+								</div>
+								<div class="text-end">
+									<span class={durum.class}>{durum.text}</span>
+								</div>
+							</div>
+							<div class="d-flex align-items-center justify-content-between mt-2">
+								<h5 class="mb-0 text-muted">{formatTurkishLira(movement.toplam)}</h5>
+								<div class="d-flex gap-2">
+									<button
+										data-bs-toggle="modal"
+										data-bs-target="#detailsModal"
+										class="btn btn-sm btn-outline-secondary flex-fill d-flex align-items-center gap-1"
+										onclick={() => (selected = movement.id)}
+									>
+										<i class="bi bi-eye"></i> İncele
+									</button>
+									{#if movement.durum !== 2 && movement.tip === 2}
+										<button
+											disabled={movement.durum === 2}
+											class="btn btn-sm btn-danger flex-fill d-flex align-items-center gap-1"
+											onclick={() => changeStatus(movement.id)}
+										>
+											<i class="bi bi-arrow-left-right"></i> Değiştir
+										</button>
+									{/if}
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			{/if}
+		{:else}
+			<div class="col-12">
+				<div class="alert alert-danger text-center mb-0" role="alert">Kayıt bulunamadı.</div>
+			</div>
+		{/each}
+	</div>
+{/snippet}
+
+<div class="d-none d-lg-block">
+	{@render filterBox()}
+</div>
+
+{#if movements && pagination}
+	<div class="d-none d-lg-block">
+		{@render table()}
+	</div>
+	<div class="d-block d-lg-none">
+		{@render card()}
 	</div>
 {:else if error}
 	<div class="alert alert-danger" role="alert">
@@ -360,6 +475,9 @@
 		<div class="modal-content">
 			{#if selected}
 				{@const selectedItem = movements.find((m) => m.id === selected)}
+				{@const isSelectedToday =
+					selectedItem &&
+					new Date(selectedItem.created_at).toDateString() === new Date().toDateString()}
 				<div class="modal-header border-0">
 					<h1 class="modal-title fs-5" id="detailsModalLabel">{selectedItem.unvan}</h1>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
@@ -398,7 +516,7 @@
 							</tr>
 							<tr>
 								<th>Toplam</th>
-								<td>{selectedItem.toplam}</td>
+								<td>{formatTurkishLira(selectedItem.toplam)}</td>
 							</tr>
 							<tr>
 								<th>Taksit</th>
@@ -434,7 +552,12 @@
 							</tr>
 							<tr>
 								<th>Oluşturulma Tarihi</th>
-								<td>{selectedItem.created_at || '-'}</td>
+								<td
+									>{formatDate(selectedItem.created_at) || '-'}
+									{#if isSelectedToday}
+										<span class="badge bg-success text-white ms-2">Bugün</span>
+									{/if}
+								</td>
 							</tr>
 							<tr>
 								<th>Hata</th>
@@ -468,7 +591,7 @@
 				{@render filterBox()}
 			</div>
 			<div class="modal-footer border-0">
-				<button type="button" class="btn btn-secondary">Kapat</button>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
 			</div>
 		</div>
 	</div>
