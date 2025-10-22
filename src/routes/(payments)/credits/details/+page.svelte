@@ -20,7 +20,7 @@
 
 	// Timeout reference for VKN delay
 	let vknTimeout: NodeJS.Timeout | null = null;
-	let isVknValid = $state(false);
+	let isVknValid = $state(0); // 0: initial/loading, 1: valid, -1: invalid
 	let valid = $derived.by(() => {
 		return (
 			selectedPackage?.id !== null &&
@@ -29,7 +29,7 @@
 			formData.adres.trim() !== '' &&
 			formData.il.trim() !== '' &&
 			formData.ilce.trim() !== '' &&
-			!!isVknValid
+			isVknValid === 1
 		);
 	});
 
@@ -66,22 +66,21 @@
 					formData.adres = json.data.adres;
 					formData.il = json.data.il;
 					formData.ilce = json.data.ilce;
-					isVknValid = true;
+					isVknValid = 1;
 				} else if (json && json.code === 0 && json.data.isValid === false) {
 					// Clear fields if VKN is invalid
 					formData.unvan = '';
 					formData.adres = '';
 					formData.il = '';
 					formData.ilce = '';
-					isVknValid = false;
-					toast.danger('Geçersiz VKN/TCKN girdiniz. Lütfen kontrol ediniz.');
+					isVknValid = -1;
 				} else {
 					// Handle other cases (invalid response structure, etc.)
-					isVknValid = false;
+					isVknValid = -1;
 				}
 			} else {
 				// Handle non-ok HTTP response
-				isVknValid = false;
+				isVknValid = -1;
 			}
 		} catch (error) {
 			console.error('VKN lookup failed:', error);
@@ -101,6 +100,9 @@
 		}
 
 		const currentValue = formData.vkn;
+
+		// Reset validation state when user starts typing
+		isVknValid = 0;
 
 		// Only clear unvan if the input is less than 10 digits (user is starting fresh or deleting)
 		if (currentValue.length < 10) {
@@ -168,13 +170,20 @@
 						bind:value={formData.vkn}
 						name="vkn"
 						type="text"
-						class="form-control"
+						class="form-control {isVknValid === -1
+							? 'is-invalid'
+							: isVknValid === 1
+								? 'is-valid'
+								: ''}"
 						id="vkn"
 						placeholder="Vergi Kimlik Numarası veya TCKN"
 						maxlength="11"
 						onkeydown={onVknKeyDown}
 						oninput={handleVknInput}
 					/>
+					{#if isVknValid === -1}
+						<div class="invalid-feedback">Geçersiz VKN/TCKN girdiniz. Lütfen kontrol ediniz.</div>
+					{/if}
 				</div>
 				<div class="mb-3">
 					<label for="unvan" class="form-label">Ünvan <code>*</code></label>
