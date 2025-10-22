@@ -199,7 +199,21 @@
 		'Aralık'
 	];
 
-	// Format date to DD.MM.YYYY HH:mm from 2025-10-03T09:55:56.603015Z
+	// const test_now = new Date();
+	// console.log('Test Now:', test_now);
+	// // format this to 2025-10-03T09:55:56.603015Z
+	// const formattedDate = test_now.toISOString();
+	// console.log('Formatted Date:', formattedDate);
+
+	// const reformattedDate = formatDate(formattedDate);
+	// console.log('Reformatted Date:', reformattedDate);
+
+	// const d = '2025-10-20T13:22:04.346939Z';
+	// console.log('Original Date:', d);
+	// const reformattedD = formatDate(d);
+	// console.log('Reformatted D:', reformattedD);
+
+	// Format date to DD.MM.YYYY HH:mm from 2025-10-03T09:55:56.60301<h1>{dateString:}</h1>
 	function formatDate(dateString: string): string {
 		if (!dateString) return '-';
 		const date = new Date(dateString);
@@ -484,6 +498,7 @@
 					></button>
 				</div>
 				<div class="modal-body">
+					<!-- <h1>{selectedItem.id}</h1> -->
 					<table class="table table-sm">
 						<tbody>
 							<tr>

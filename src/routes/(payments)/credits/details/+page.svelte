@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
 	import { goto } from '$app/navigation';
-	import { spinner } from '@ruzgardogu/utils';
+	import { spinner, toast } from '@ruzgardogu/utils';
 
 	let { data }: PageProps = $props();
 	let { selectedPackage } = data;
@@ -20,7 +20,7 @@
 
 	// Timeout reference for VKN delay
 	let vknTimeout: NodeJS.Timeout | null = null;
-
+	let isVknValid = $state(false);
 	let valid = $derived.by(() => {
 		return (
 			selectedPackage?.id !== null &&
@@ -28,7 +28,8 @@
 			formData.unvan.trim() !== '' &&
 			formData.adres.trim() !== '' &&
 			formData.il.trim() !== '' &&
-			formData.ilce.trim() !== ''
+			formData.ilce.trim() !== '' &&
+			!!isVknValid
 		);
 	});
 
@@ -59,12 +60,28 @@
 			const res = await fetch(`https://payment-api.arniva.tr/v1/mukellefler/${vknValue}`);
 			if (res.ok) {
 				const json = await res.json();
-				if (json && json.data && json.code === 0) {
+				console.log('VKN lookup response:', json);
+				if (json && json.data && json.code === 0 && json.data.isValid === true) {
 					formData.unvan = json.data.adi;
 					formData.adres = json.data.adres;
 					formData.il = json.data.il;
 					formData.ilce = json.data.ilce;
+					isVknValid = true;
+				} else if (json && json.code === 0 && json.data.isValid === false) {
+					// Clear fields if VKN is invalid
+					formData.unvan = '';
+					formData.adres = '';
+					formData.il = '';
+					formData.ilce = '';
+					isVknValid = false;
+					toast.danger('Geçersiz VKN/TCKN girdiniz. Lütfen kontrol ediniz.');
+				} else {
+					// Handle other cases (invalid response structure, etc.)
+					isVknValid = false;
 				}
+			} else {
+				// Handle non-ok HTTP response
+				isVknValid = false;
 			}
 		} catch (error) {
 			console.error('VKN lookup failed:', error);
