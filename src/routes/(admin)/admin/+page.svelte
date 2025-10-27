@@ -371,9 +371,8 @@
 										<i class="bi bi-eye"></i>
 										<span class="d-none d-lg-flex"> İncele </span>
 									</button>
-									{#if movement.durum !== 2 && movement.durum !== 0 && movement.tip === 2}
+									{#if movement.durum === 1 && movement.tip === 2}
 										<button
-											disabled={movement.durum === 2}
 											class="btn btn-sm btn-danger d-flex align-items-center gap-1"
 											onclick={() => changeStatus(movement.id)}
 										>
@@ -431,9 +430,8 @@
 									>
 										<i class="bi bi-eye"></i> İncele
 									</button>
-									{#if movement.durum !== 2 && movement.durum !== 0 && movement.tip === 2}
+									{#if movement.durum === 1 && movement.tip === 2}
 										<button
-											disabled={movement.durum === 2}
 											class="btn btn-sm btn-danger flex-fill d-flex align-items-center gap-1"
 											onclick={() => changeStatus(movement.id)}
 										>
