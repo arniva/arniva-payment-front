@@ -27,7 +27,8 @@
 		{ value: '0', label: 'Bekleniyor' },
 		{ value: '1', label: 'Ödendi' },
 		{ value: '2', label: 'Yüklendi' },
-		{ value: '-1', label: 'Hatalı' }
+		{ value: '-1', label: 'Ödeme Hatası' },
+		{ value: '-2', label: 'Hızlıbilişim Hatası' }
 	];
 
 	const searchColumns = [
