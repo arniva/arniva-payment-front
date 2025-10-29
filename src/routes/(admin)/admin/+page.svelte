@@ -200,29 +200,31 @@
 		'Aralık'
 	];
 
-	// const test_now = new Date();
-	// console.log('Test Now:', test_now);
-	// // format this to 2025-10-03T09:55:56.603015Z
-	// const formattedDate = test_now.toISOString();
-	// console.log('Formatted Date:', formattedDate);
+	const test_now = new Date();
+	console.log('Test Now:', test_now);
+	// format this to 2025-10-03T09:55:56.603015Z
+	const formattedDate = test_now.toISOString();
+	console.log('Formatted Date:', formattedDate);
 
-	// const reformattedDate = formatDate(formattedDate);
-	// console.log('Reformatted Date:', reformattedDate);
+	const reformattedDate = formatDate(formattedDate);
+	console.log('Reformatted Date:', reformattedDate);
 
-	// const d = '2025-10-20T13:22:04.346939Z';
-	// console.log('Original Date:', d);
-	// const reformattedD = formatDate(d);
-	// console.log('Reformatted D:', reformattedD);
+	const d = '2025-10-20T13:22:04.346939Z';
+	console.log('Original Date:', d);
+	const reformattedD = formatDate(d);
+	console.log('Reformatted D:', reformattedD);
 
-	// Format date to DD.MM.YYYY HH:mm from 2025-10-03T09:55:56.60301<h1>{dateString:}</h1>
+	// Format date to DD.MM.YYYY HH:mm from 2025-10-03T09:55:56.60301Z
 	function formatDate(dateString: string): string {
 		if (!dateString) return '-';
 		const date = new Date(dateString);
-		const day = String(date.getDate()).padStart(2, '0');
-		const monthName = monthNames[date.getMonth()];
-		const year = date.getFullYear();
-		const hours = String(date.getHours()).padStart(2, '0');
-		const minutes = String(date.getMinutes()).padStart(2, '0');
+
+		// Use UTC methods to display the time as-is from the API (without timezone conversion)
+		const day = String(date.getUTCDate()).padStart(2, '0');
+		const monthName = monthNames[date.getUTCMonth()];
+		const year = date.getUTCFullYear();
+		const hours = String(date.getUTCHours()).padStart(2, '0');
+		const minutes = String(date.getUTCMinutes()).padStart(2, '0');
 		return `${day} ${monthName} ${year} - ${hours}:${minutes}`;
 	}
 </script>
