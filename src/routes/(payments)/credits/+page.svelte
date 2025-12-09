@@ -64,7 +64,7 @@
 					</tr>
 					<tr>
 						<th>Kontör Adedi</th>
-						<th class="d-none d-md-table-cell text-end pe-2">Birim Fiyatı</th>
+						<th class="d-none d-md-table-cell text-end pe-2">Kdv Dahil Birim Fiyatı</th>
 						<th class="text-end pe-2">Tutarı</th>
 						<th class="text-center">Seçiniz</th>
 					</tr>
@@ -95,7 +95,7 @@
 					</tr>
 					<tr>
 						<th>Kontör Adedi</th>
-						<th class="d-none d-md-table-cell text-end pe-2">Birim Fiyatı</th>
+						<th class="d-none d-md-table-cell text-end pe-2">Kdv Dahil Birim Fiyatı</th>
 						<th class="text-end pe-2">Tutarı</th>
 						<th class="text-center">Seçiniz</th>
 					</tr>
